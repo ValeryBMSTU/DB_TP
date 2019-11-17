@@ -7,7 +7,15 @@ const (
 	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.user SET username = $1, name = $2, 	surname = $3," +
 		" hashpassword = $4,email = $5, age = $6, status = $7 where id = $8"
 	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.user SET avatardir = $1 where id = $2"
-	INSERTUser              = "INSERT INTO sunrise.user (username, email, hashpassword, salt, created_time)	values ($1,$2,$3,$4,$5) RETURNING id"
+
+	INSERTForum = `INSERT INTO forum.forum (slug,title,"user") values ($1,$2,$3) RETURNING id`
+
+	INSERTThread = `INSERT INTO forum.thread (author, created, message, title, forum) values ($1,$2,$3,$4,$5) RETURNING id`
+	INSERTThreadWithSlug = `INSERT INTO forum.thread (author, created, message, title, forum, slug) values ($1,$2,$3,$4,$5,$6) RETURNING id`
+
+	INSERTUser              = "INSERT INTO forum.user (about, email, fullname, nickname) values ($1,$2,$3,$4) RETURNING id"
+
+
 	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 
 	SELECTUserByCookieValue = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +

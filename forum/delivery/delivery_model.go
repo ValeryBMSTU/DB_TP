@@ -5,10 +5,20 @@ import (
 	"github.com/labstack/echo"
 )
 
+type HandlersStruct struct {
+	Use usecase.UseInterface
+}
+
 func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface) error {
-	h.PUsecase = usecase
+	h.Use = usecase
 
 	//e.GET("/", h.HandleEmpty)
+	e.POST( "/forum/create", h.CreateForum)
+
+	e.POST( "/forum/:slug/create", h.CreateThread)
+
+	e.POST( "/user/:nickname/create", h.CreateUser)
+
 
 	return nil
 }

@@ -27,7 +27,7 @@ func main() {
 	rep := repository.ReposStruct{}
 	err := rep.DataBaseInit()
 	if err != nil {
-		return
+		e.Logger.Errorf("repository error: %s", err)
 	}
 
 	useCase := use.UseStruct{}

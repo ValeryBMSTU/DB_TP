@@ -2,22 +2,24 @@ package usecase
 
 import (
 	"github.com/ValeryBMSTU/DB_TP/forum/repository"
+	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"sync"
 )
 
 
 type UseStruct struct {
-	PRepository repository.ReposInterface
+	Rep repository.ReposInterface
 	Mu          *sync.Mutex
 }
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface) error {
 	USC.Mu = mu
-	USC.PRepository = rep
+	USC.Rep = rep
 	return nil
 }
 
 type UseInterface interface {
-	//SetJSONData(data interface{}, token string, infMsg string) models.OutJSON
-
+	AddForum(newForum models.NewForum) (forum models.Forum, Err error)
+	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
+	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
 }
