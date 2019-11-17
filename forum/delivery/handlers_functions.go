@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"github.com/ValeryBMSTU/DB_TP/pinterest/usecase"
+	"github.com/ValeryBMSTU/DB_TP/forum/usecase"
 	"github.com/labstack/echo"
 )
 

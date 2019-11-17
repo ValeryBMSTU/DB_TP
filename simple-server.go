@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/ValeryBMSTU/DB_TP/pinterest/delivery"
-	"github.com/ValeryBMSTU/DB_TP/pinterest/repository"
-	use "github.com/ValeryBMSTU/DB_TP/pinterest/usecase"
+	"github.com/ValeryBMSTU/DB_TP/forum/delivery"
+	"github.com/ValeryBMSTU/DB_TP/forum/repository"
+	use "github.com/ValeryBMSTU/DB_TP/forum/usecase"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	customMiddlewares "github.com/ValeryBMSTU/DB_TP/pkg/middlewares"
 	"github.com/labstack/echo"

@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/ValeryBMSTU/DB_TP/pinterest/repository"
+	"github.com/ValeryBMSTU/DB_TP/forum/repository"
 	"sync"
 )
 
