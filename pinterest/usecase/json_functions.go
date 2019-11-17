@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 )
 
 func (USC UseStruct) SetJSONData(data interface{}, token string, infMsg string) models.OutJSON {

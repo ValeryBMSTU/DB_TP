@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"github.com/ValeryBMSTU/DB_TP/pinterest/repository"
-	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"sync"
 )
 
@@ -19,6 +18,6 @@ func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface) 
 }
 
 type UseInterface interface {
-	SetJSONData(data interface{}, token string, infMsg string) models.OutJSON
+	//SetJSONData(data interface{}, token string, infMsg string) models.OutJSON
 
 }

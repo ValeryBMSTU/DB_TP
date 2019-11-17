@@ -9,8 +9,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.2.0
-	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
-	golang.org/x/crypto v0.0.0-20191117063200-497ca9f6d64f
+	golang.org/x/crypto v0.0.0-20191117063200-497ca9f6d64f // indirect
 )

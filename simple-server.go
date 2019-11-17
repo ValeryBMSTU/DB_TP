@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/ValeryBMSTU/DB_TP/pinterest/delivery"
 	"github.com/ValeryBMSTU/DB_TP/pinterest/repository"
-	"github.com/ValeryBMSTU/DB_TP/pinterest/usecase"
+	use "github.com/ValeryBMSTU/DB_TP/pinterest/usecase"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	customMiddlewares "github.com/ValeryBMSTU/DB_TP/pkg/middlewares"
 	"github.com/labstack/echo"
@@ -30,7 +30,7 @@ func main() {
 		return
 	}
 
-	useCase := usecase.UseStruct{}
+	useCase := use.UseStruct{}
 	err = useCase.NewUseCase(&mutex, &rep)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
