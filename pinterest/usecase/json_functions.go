@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
@@ -55,11 +54,11 @@ func (USC UseStruct) SetJSONData(data interface{}, token string, infMsg string) 
 	}
 	return outJSON
 }
-
-func (USC UseStruct) SetResponseError(encoder *json.Encoder, msg string, err error) error {
-	data := USC.SetJSONData(nil, "",  msg)
-	if err := encoder.Encode(data); err != nil {
-		return err
-	}
-	return nil
-}
+//
+//func (USC UseStruct) SetResponseError(encoder *json.Encoder, msg string, err error) error {
+//	data := USC.SetJSONData(nil, "",  msg)
+//	if err := encoder.Encode(data); err != nil {
+//		return err
+//	}
+//	return nil
+//}

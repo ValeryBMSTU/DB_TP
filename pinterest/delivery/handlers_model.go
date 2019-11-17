@@ -1,6 +1,6 @@
 package delivery
 
-import "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
+import "github.com/ValeryBMSTU/DB_TP/pinterest/usecase"
 
 type HandlersStruct struct {
 	PUsecase usecase.UseInterface
