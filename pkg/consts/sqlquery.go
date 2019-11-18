@@ -14,6 +14,8 @@ const (
 	INSERTThreadWithSlug = `INSERT INTO forum.thread (author, created, message, title, forum, slug) values ($1,$2,$3,$4,$5,$6) RETURNING id;`
 
 	INSERTUser              = "INSERT INTO forum.user (about, email, fullname, nickname) values ($1,$2,$3,$4) RETURNING id;"
+	SELECTUsersByNickname   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
+		`FROM forum.user as u WHERE lower(u.nickname) = lower($1);`
 	SELECTUsersByNicknameOrEmail   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.email) = lower($1) OR lower(u.nickname) = lower($2);`
 

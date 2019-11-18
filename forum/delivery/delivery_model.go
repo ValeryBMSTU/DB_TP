@@ -18,6 +18,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface)
 	e.POST( "/forum/:slug/create", h.CreateThread)
 
 	e.POST( "/user/:nickname/create", h.CreateUser)
+	e.GET( "/user/:nickname/profile", h.TakeUser)
 
 
 	return nil

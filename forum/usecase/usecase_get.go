@@ -11,3 +11,13 @@ func (use *UseStruct) GetUsersByNicknameOrEmail(email string, nickname string) (
 
 	return users,nil
 }
+
+func (use *UseStruct) GetUserByNickname(nickname string) (user models.User, Err error) {
+	user, err := use.Rep.SelectUsersByNickname(nickname)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user,nil
+}
