@@ -22,4 +22,5 @@ type UseInterface interface {
 	AddForum(newForum models.NewForum) (forum models.Forum, Err error)
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
 	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
+	GetUsersByNicknameOrEmail(email string, nickname string) (user []models.User, Err error)
 }
