@@ -54,3 +54,7 @@ type User struct {
 
 // ==============================
 
+type Error struct {
+	Message string `json:"message"`
+}
+

@@ -18,6 +18,7 @@ const (
 		`FROM forum.user as u WHERE lower(u.nickname) = lower($1);`
 	SELECTUsersByNicknameOrEmail   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.email) = lower($1) OR lower(u.nickname) = lower($2);`
+	UPDATEUserByNickname = "UPDATE forum.user SET about = $1, email = $2, fullname = $3 WHERE nickname = $4"
 
 
 	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"

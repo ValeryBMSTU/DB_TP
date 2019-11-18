@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 )
@@ -49,6 +50,10 @@ func (rep *ReposStruct) SelectUsersByNickname(nickname string) (user models.User
 			return models.User{}, err
 		}
 		users = append(users, scanUser)
+	}
+
+	if len(users) == 0 {
+		return models.User{}, errors.New("Can't find user by nickname")
 	}
 	return users[0], nil
 }

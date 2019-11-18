@@ -24,4 +24,5 @@ type UseInterface interface {
 	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
 	GetUserByNickname(nickname string) (user models.User, Err error)
 	GetUsersByNicknameOrEmail(email string, nickname string) (user []models.User, Err error)
+	SetUser(newProfile models.NewUser, nickname string) (user models.User, Err error)
 }

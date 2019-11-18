@@ -16,4 +16,5 @@ type ReposInterface interface {
 	InsertUser(newUser models.NewUser, nickname string) (Err error)
 	SelectUsersByNickname(nickname string) (user models.User, Err error)
 	SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error)
+	UpdateUser(newProfile models.NewUser, nickname string) (Err error)
 }
