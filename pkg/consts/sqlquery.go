@@ -12,7 +12,15 @@ const (
 		`FROM forum.forum as f WHERE lower(f.slug) = lower($1);`
 
 	INSERTThread = `INSERT INTO forum.thread (author, created, message, title, forum) values ($1,$2,$3,$4,$5) RETURNING id;`
+	INSERTThreadWithoutCreated = `INSERT INTO forum.thread (author, message, title, forum) values ($1,$2,$3,$4) RETURNING id;`
+	INSERTThreadWithSlugWithoutCreated = `INSERT INTO forum.thread (author, message, title, forum, slug) values ($1,$2,$3,$4,$5) RETURNING id;`
 	INSERTThreadWithSlug = `INSERT INTO forum.thread (author, created, message, title, forum, slug) values ($1,$2,$3,$4,$5,$6) RETURNING id;`
+	SELECTThreadsByForum = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
+		`FROM forum.thread as t WHERE t.forum = $1 LIMIT $2;`
+	SELECTThreadsByForumSince = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
+		`FROM forum.thread as t WHERE t.forum = $1 ORDER BY created LIMIT $2;`
+	SELECTThreadsByForumSinceDesc = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
+		`FROM forum.thread as t WHERE t.forum = $1 ORDER BY created DESC LIMIT $2;`
 
 	INSERTUser              = "INSERT INTO forum.user (about, email, fullname, nickname) values ($1,$2,$3,$4) RETURNING id;"
 	SELECTUsersByNickname   = `SELECT u.about, u.email, u.fullname, u.nickname ` +

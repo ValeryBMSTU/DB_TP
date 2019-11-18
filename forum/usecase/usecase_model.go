@@ -21,7 +21,10 @@ func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface) 
 type UseInterface interface {
 	AddForum(newForum models.NewForum) (forum models.Forum, Err error)
 	GetForumsBySlug(slug string) (forum []models.Forum, Err error)
+
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
+	GetThreadsByForum(forum string, limit string, since string, desc string) (Threads []models.Thread, Err error)
+
 	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
 	GetUserByNickname(nickname string) (user models.User, Err error)
 	GetUsersByEmail(email string) (user []models.User, Err error)

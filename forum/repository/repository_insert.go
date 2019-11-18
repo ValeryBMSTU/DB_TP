@@ -19,11 +19,21 @@ func (rep *ReposStruct) InsertForum(newForum models.NewForum) (Err error) {
 func (rep *ReposStruct) InsertThread(newThread models.NewThread, forum string) (LastID int, Err error) {
 	var lastID int
 	if newThread.Slug == "" {
-		Err = rep.DataBase.QueryRow(consts.INSERTThread, newThread.Author, newThread.Created,
-			newThread.Message, newThread.Title, forum).Scan(&lastID)
+		if newThread.Created == "" {
+			Err = rep.DataBase.QueryRow(consts.INSERTThreadWithoutCreated, newThread.Author,
+				newThread.Message, newThread.Title, forum).Scan(&lastID)
+		} else {
+			Err = rep.DataBase.QueryRow(consts.INSERTThread, newThread.Author, newThread.Created,
+				newThread.Message, newThread.Title, forum).Scan(&lastID)
+		}
 	} else {
-		Err = rep.DataBase.QueryRow(consts.INSERTThreadWithSlug, newThread.Author, newThread.Created,
-			newThread.Message, newThread.Title, forum, newThread.Slug).Scan(&lastID)
+		if newThread.Created == "" {
+			Err = rep.DataBase.QueryRow(consts.INSERTThreadWithSlugWithoutCreated, newThread.Author,
+				newThread.Message, newThread.Title, forum, newThread.Slug).Scan(&lastID)
+		} else {
+			Err = rep.DataBase.QueryRow(consts.INSERTThreadWithSlug, newThread.Author, newThread.Created,
+				newThread.Message, newThread.Title, forum, newThread.Slug).Scan(&lastID)
+		}
 	}
 	if Err != nil {
 		return lastID, Err

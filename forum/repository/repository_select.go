@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
@@ -25,6 +26,37 @@ func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, E
 	}
 
 	return forums, nil
+}
+
+func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads []models.Thread, Err error) {
+	var threads []models.Thread
+	var rows *sql.Rows
+	var err error
+	if since == "" && desc == "" {
+		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForum, forum, limit)
+	} else if since != "" && desc == "" {
+		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumSince, forum, limit)
+	} else if since == "" && desc != "" {
+		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumDesc, forum, limit)
+	} else {
+		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumSinceDesc, forum, limit)
+	}
+	defer rows.Close()
+	if err != nil {
+		return threads, err
+	}
+
+	scanThread := models.Thread{}
+	for rows.Next() {
+		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
+			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
+			&scanThread.Votes)
+		if err != nil {
+			return threads, err
+		}
+		threads = append(threads, scanThread)
+	}
+	return threads, nil
 }
 
 func (rep *ReposStruct) SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error) {

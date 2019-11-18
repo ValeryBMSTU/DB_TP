@@ -33,6 +33,44 @@ func (h *HandlersStruct) TakeForum(ctx echo.Context) (Err error) {
 	return nil
 }
 
+func (h *HandlersStruct) TakeForumThreads(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	limit := ctx.QueryParam("limit")
+	since := ctx.QueryParam("since")
+	desc := ctx.QueryParam("desc")
+
+	if limit == "" {
+		limit = "100"
+	}
+
+	forums, err := h.Use.GetForumsBySlug(ctx.Param("slug"))
+
+	if err != nil || len(forums) == 0 {
+		if err := ctx.JSON(404, models.Error{"Can't find forum by slug"}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	threads, err := h.Use.GetThreadsByForum(ctx.Param("slug"), limit, since, desc)
+	if err != nil {
+		return err
+	}
+
+	if err := ctx.JSON(200, threads); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (h *HandlersStruct) TakeUser(ctx echo.Context) (Err error) {
 	defer func() {
 		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
