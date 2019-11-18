@@ -6,6 +6,27 @@ import (
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 )
 
+func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, Err error) {
+	var forums []models.Forum
+	rows, err := rep.DataBase.Query(consts.SELECTForumsBySlug, slug)
+	defer rows.Close()
+	if err != nil {
+		return forums, err
+	}
+
+	scanForum := models.Forum{}
+	for rows.Next() {
+		err := rows.Scan(&scanForum.Posts, &scanForum.Slug, &scanForum.Thread,
+			&scanForum.Title, &scanForum.User)
+		if err != nil {
+			return forums, err
+		}
+		forums = append(forums, scanForum)
+	}
+
+	return forums, nil
+}
+
 func (rep *ReposStruct) SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error) {
 	var users []models.User
 	rows, err := rep.DataBase.Query(consts.SELECTUsersByNicknameOrEmail, email, nickname)

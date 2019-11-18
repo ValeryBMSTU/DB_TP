@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -23,8 +24,29 @@ func (h *HandlersStruct) CreateForum(ctx echo.Context) (Err error) {
 		return err
 	}
 
+	forums, err := h.Use.GetForumsBySlug(newForum.Slug)
+	if err != nil {
+		return err
+	}
+	if len(forums) > 0 {
+		if err := ctx.JSON(409, forums[0]); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	forum, err := h.Use.AddForum(newForum)
 	if err != nil {
+		pqErr, ok := err.(*pq.Error)
+		if !ok {
+			return err
+		}
+		if pqErr.Code == "23503" {
+			if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
+				return err
+			}
+			return nil
+		}
 		return err
 	}
 

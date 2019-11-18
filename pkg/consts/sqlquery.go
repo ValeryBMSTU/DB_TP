@@ -8,6 +8,8 @@ const (
 	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.user SET avatardir = $1 where id = $2"
 
 	INSERTForum = `INSERT INTO forum.forum (slug,title,"user") values ($1,$2,$3) RETURNING id;`
+	SELECTForumsBySlug   = `SELECT f.posts, f.slug, f.threads, f.title, f.user ` +
+		`FROM forum.forum as f WHERE lower(f.slug) = lower($1);`
 
 	INSERTThread = `INSERT INTO forum.thread (author, created, message, title, forum) values ($1,$2,$3,$4,$5) RETURNING id;`
 	INSERTThreadWithSlug = `INSERT INTO forum.thread (author, created, message, title, forum, slug) values ($1,$2,$3,$4,$5,$6) RETURNING id;`

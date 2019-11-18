@@ -1,6 +1,17 @@
 package usecase
 
-import "github.com/ValeryBMSTU/DB_TP/pkg/models"
+import (
+	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+)
+
+func (use *UseStruct) GetForumsBySlug(slug string) (Forum []models.Forum, Err error) {
+	forums, err := use.Rep.SelectForumsBySlug(slug)
+	if err != nil {
+		return forums, err
+	}
+
+	return forums,nil
+}
 
 func (use *UseStruct) GetUsersByNicknameOrEmail(email string, nickname string) (User []models.User, Err error) {
 	users, err := use.Rep.SelectUsersByNicknameOrEmail(email, nickname)

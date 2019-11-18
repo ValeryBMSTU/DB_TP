@@ -14,6 +14,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface)
 
 	//e.GET("/", h.HandleEmpty)
 	e.POST( "/forum/create", h.CreateForum)
+	e.GET( "/forum/:slug/details", h.TakeForum)
 
 	e.POST( "/forum/:slug/create", h.CreateThread)
 

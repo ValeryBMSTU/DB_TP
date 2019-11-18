@@ -6,6 +6,33 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (h *HandlersStruct) TakeForum(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+
+
+	forums, err := h.Use.GetForumsBySlug(ctx.Param("slug"))
+
+	if err != nil || len(forums) == 0 {
+		if err := ctx.JSON(404, models.Error{"Can't find forum by slug"}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if err := ctx.JSON(200, forums[0]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (h *HandlersStruct) TakeUser(ctx echo.Context) (Err error) {
 	defer func() {
 		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {

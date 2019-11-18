@@ -12,6 +12,7 @@ type ReposStruct struct {
 
 type ReposInterface interface {
 	InsertForum(newForum models.NewForum) (Err error)
+	SelectForumsBySlug(slug string) (forum []models.Forum, Err error)
 	InsertThread(newThread models.NewThread, forum string) (LastID int, Err error)
 	InsertUser(newUser models.NewUser, nickname string) (Err error)
 	SelectUsersByNickname(nickname string) (user models.User, Err error)
