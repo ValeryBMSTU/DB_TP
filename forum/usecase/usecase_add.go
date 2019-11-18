@@ -5,6 +5,13 @@ import (
 )
 
 func (use *UseStruct) AddForum(newForum models.NewForum) (Forum models.Forum, Err error) {
+	user, err := use.Rep.SelectUserByNickname(newForum.User)
+	if err != nil {
+		return models.Forum{}, err
+	}
+
+	newForum.User = user.Nickname
+
 	if err := use.Rep.InsertForum(newForum); err != nil {
 		return models.Forum{}, err
 	}

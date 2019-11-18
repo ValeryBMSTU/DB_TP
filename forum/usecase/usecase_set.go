@@ -3,7 +3,7 @@ package usecase
 import "github.com/ValeryBMSTU/DB_TP/pkg/models"
 
 func (use *UseStruct) SetUser(newProfile models.NewUser, nickname string) (User models.User, Err error) {
-	curentUser, err := use.Rep.SelectUsersByNickname(nickname)
+	curentUser, err := use.Rep.SelectUserByNickname(nickname)
 	if err != nil {
 		return models.User{}, err
 	}

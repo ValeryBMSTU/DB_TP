@@ -24,7 +24,7 @@ func (use *UseStruct) GetUsersByNicknameOrEmail(email string, nickname string) (
 }
 
 func (use *UseStruct) GetUserByNickname(nickname string) (user models.User, Err error) {
-	user, err := use.Rep.SelectUsersByNickname(nickname)
+	user, err := use.Rep.SelectUserByNickname(nickname)
 
 	if err != nil {
 		return user, err

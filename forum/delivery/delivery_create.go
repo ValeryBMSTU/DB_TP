@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"github.com/labstack/echo"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -37,16 +36,22 @@ func (h *HandlersStruct) CreateForum(ctx echo.Context) (Err error) {
 
 	forum, err := h.Use.AddForum(newForum)
 	if err != nil {
-		pqErr, ok := err.(*pq.Error)
-		if !ok {
-			return err
-		}
-		if pqErr.Code == "23503" {
+		if err.Error() == "Can't find user by nickname" {
 			if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
 				return err
 			}
 			return nil
 		}
+		//pqErr, ok := err.(*pq.Error)
+		//if !ok {
+		//	return err
+		//}
+		//if pqErr.Code == "23503" {
+		//	if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
+		//		return err
+		//	}
+		//	return nil
+		//}
 		return err
 	}
 

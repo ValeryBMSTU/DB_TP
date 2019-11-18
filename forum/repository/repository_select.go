@@ -47,7 +47,7 @@ func (rep *ReposStruct) SelectUsersByNicknameOrEmail(email string, nickname stri
 	return users, nil
 }
 
-func (rep *ReposStruct) SelectUsersByNickname(nickname string) (user models.User, Err error) {
+func (rep *ReposStruct) SelectUserByNickname(nickname string) (user models.User, Err error) {
 	var users []models.User
 	rows, err := rep.DataBase.Query(consts.SELECTUsersByNickname, nickname)
 	defer rows.Close()
