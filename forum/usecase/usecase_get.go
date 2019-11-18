@@ -21,3 +21,13 @@ func (use *UseStruct) GetUserByNickname(nickname string) (user models.User, Err 
 
 	return user,nil
 }
+
+func (use *UseStruct) GetUsersByEmail(email string) (User []models.User, Err error) {
+	users, err := use.Rep.SelectUsersByEmail(email)
+
+	if err != nil {
+		return users, err
+	}
+
+	return users,nil
+}

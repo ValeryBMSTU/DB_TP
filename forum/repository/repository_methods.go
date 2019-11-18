@@ -17,7 +17,7 @@ func (RS *ReposStruct) DataBaseInit() error {
 	if err != nil {
 		return err
 	}
-	RS.DataBase.SetMaxOpenConns(10)
+	RS.DataBase.SetMaxOpenConns(100)
 	err = RS.DataBase.Ping()
 	if err != nil {
 		return err

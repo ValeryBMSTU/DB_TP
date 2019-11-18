@@ -24,11 +24,12 @@ func (h *HandlersStruct) ChangeUser(ctx echo.Context) (Err error) {
 	}
 
 
-	users, err := h.Use.GetUsersByNicknameOrEmail(newProfile.Email, "")
+	users, err := h.Use.GetUsersByEmail(newProfile.Email)
 	if err != nil {
 		return err
 	}
-	if len(users) > 0 {
+	if len(users) > 0 && !(len(users) == 1 &&
+		users[0].Nickname == ctx.Param("nickname")){
 		if err := ctx.JSON(409, models.Error{"Conflict"}); err != nil {
 			return err
 		}
@@ -38,6 +39,12 @@ func (h *HandlersStruct) ChangeUser(ctx echo.Context) (Err error) {
 
 	user, err := h.Use.SetUser(newProfile, ctx.Param("nickname"))
 	if err != nil {
+		if err.Error() == "Can't find user by nickname" {
+			if err := ctx.JSON(404, models.Error{err.Error()}); err != nil {
+				return err
+			}
+			return nil
+		}
 		return err
 	}
 

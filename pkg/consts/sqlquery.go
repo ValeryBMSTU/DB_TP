@@ -1,7 +1,6 @@
 package consts
 
 const (
-	SELECTUserIDByEmail                        = "SELECT u.id from sunrise.user as u where u.email = $1"
 	SELECTUserIDUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.user as u where u.username = $1 OR u.email = $2"
 	SELECTAllUsers                             = "SELECT * from sunrise.user"
 	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.user SET username = $1, name = $2, 	surname = $3," +
@@ -16,6 +15,8 @@ const (
 	INSERTUser              = "INSERT INTO forum.user (about, email, fullname, nickname) values ($1,$2,$3,$4) RETURNING id;"
 	SELECTUsersByNickname   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.nickname) = lower($1);`
+	SELECTUsersByEmail = `SELECT u.about, u.email, u.fullname, u.nickname ` +
+		`FROM forum.user as u WHERE lower(u.email) = lower($1);`
 	SELECTUsersByNicknameOrEmail   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.email) = lower($1) OR lower(u.nickname) = lower($2);`
 	UPDATEUserByNickname = "UPDATE forum.user SET about = $1, email = $2, fullname = $3 WHERE nickname = $4"
@@ -30,8 +31,6 @@ const (
 		" as s where s.cookiesvalue = $1"
 	SELECTUsersByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username = $1"
-	SELECTUsersByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.email = $1"
 
 	DELETESessionByKey = "DELETE FROM sunrise.usersession as s WHERE s.cookiesvalue = $1"
 

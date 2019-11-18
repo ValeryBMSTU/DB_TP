@@ -6,8 +6,9 @@ import (
 )
 
 func (rep *ReposStruct) UpdateUser(newProfile models.NewUser, nickname string) (Err error) {
-	_, err := rep.DataBase.Query(consts.UPDATEUserByNickname, newProfile.About, newProfile.Email,
+	rows, err := rep.DataBase.Query(consts.UPDATEUserByNickname, newProfile.About, newProfile.Email,
 		newProfile.Fullname, nickname)
+	defer rows.Close()
 
 	if err != nil {
 		return err
