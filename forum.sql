@@ -1,25 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 10.10
--- Dumped by pg_dump version 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: forum; Type: SCHEMA; Schema: -; Owner: postgres
---
-
 CREATE SCHEMA forum;
 
 
@@ -68,13 +46,53 @@ ALTER SEQUENCE forum.forum_id_seq OWNED BY forum.forum.id;
 
 
 --
+-- Name: post; Type: TABLE; Schema: forum; Owner: postgres
+--
+
+CREATE TABLE forum.post (
+    id integer NOT NULL,
+    author text NOT NULL,
+    created timestamp with time zone,
+    forum text NOT NULL,
+    isedited boolean DEFAULT false NOT NULL,
+    message text NOT NULL,
+    parent integer DEFAULT 0 NOT NULL,
+    thread integer NOT NULL
+);
+
+
+ALTER TABLE forum.post OWNER TO postgres;
+
+--
+-- Name: post_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
+--
+
+CREATE SEQUENCE forum.post_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE forum.post_id_seq OWNER TO postgres;
+
+--
+-- Name: post_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
+--
+
+ALTER SEQUENCE forum.post_id_seq OWNED BY forum.post.id;
+
+
+--
 -- Name: thread; Type: TABLE; Schema: forum; Owner: postgres
 --
 
 CREATE TABLE forum.thread (
     id integer NOT NULL,
     author text NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created timestamp with time zone,
     forum text NOT NULL,
     message text NOT NULL,
     slug text,
@@ -152,6 +170,13 @@ ALTER TABLE ONLY forum.forum ALTER COLUMN id SET DEFAULT nextval('forum.forum_id
 
 
 --
+-- Name: post id; Type: DEFAULT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post ALTER COLUMN id SET DEFAULT nextval('forum.post_id_seq'::regclass);
+
+
+--
 -- Name: thread id; Type: DEFAULT; Schema: forum; Owner: postgres
 --
 
@@ -166,51 +191,31 @@ ALTER TABLE ONLY forum."user" ALTER COLUMN id SET DEFAULT nextval('forum.user_id
 
 
 --
--- Data for Name: forum; Type: TABLE DATA; Schema: forum; Owner: postgres
---
-
-COPY forum.forum (id, posts, slug, threads, title, "user") FROM stdin;
-1	0	work	0	Work far everybody	Bob
-\.
-
-
---
--- Data for Name: thread; Type: TABLE DATA; Schema: forum; Owner: postgres
---
-
-COPY forum.thread (id, author, created, forum, message, slug, title, votes) FROM stdin;
-1	Bob	2017-01-01 00:00:00	work	Hello World	\N	Bob is here	0
-\.
-
-
---
--- Data for Name: user; Type: TABLE DATA; Schema: forum; Owner: postgres
---
-
-COPY forum."user" (id, about, email, fullname, nickname) FROM stdin;
-5	Это я	my@mail.com	Bob Bobkov	Bob
-\.
-
-
---
 -- Name: forum_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.forum_id_seq', 1, true);
+SELECT pg_catalog.setval('forum.forum_id_seq', 1235, true);
+
+
+--
+-- Name: post_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
+--
+
+SELECT pg_catalog.setval('forum.post_id_seq', 26, true);
 
 
 --
 -- Name: table_name_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.table_name_id_seq', 1, true);
+SELECT pg_catalog.setval('forum.table_name_id_seq', 1965, true);
 
 
 --
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.user_id_seq', 5, true);
+SELECT pg_catalog.setval('forum.user_id_seq', 10484, true);
 
 
 --
@@ -219,6 +224,14 @@ SELECT pg_catalog.setval('forum.user_id_seq', 5, true);
 
 ALTER TABLE ONLY forum.forum
     ADD CONSTRAINT forum_pk PRIMARY KEY (id);
+
+
+--
+-- Name: post post_pk; Type: CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post
+    ADD CONSTRAINT post_pk PRIMARY KEY (id);
 
 
 --
@@ -249,6 +262,13 @@ CREATE UNIQUE INDEX forum_id_uindex ON forum.forum USING btree (id);
 --
 
 CREATE UNIQUE INDEX forum_slug_uindex ON forum.forum USING btree (slug);
+
+
+--
+-- Name: post_id_uindex; Type: INDEX; Schema: forum; Owner: postgres
+--
+
+CREATE UNIQUE INDEX post_id_uindex ON forum.post USING btree (id);
 
 
 --
@@ -295,6 +315,22 @@ ALTER TABLE ONLY forum.forum
 
 
 --
+-- Name: post post_thread_id_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post
+    ADD CONSTRAINT post_thread_id_fk FOREIGN KEY (thread) REFERENCES forum.thread(id);
+
+
+--
+-- Name: post post_user_nickname_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post
+    ADD CONSTRAINT post_user_nickname_fk FOREIGN KEY (author) REFERENCES forum."user"(nickname);
+
+
+--
 -- Name: thread thread_forum_slug_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
 --
 
@@ -313,4 +349,3 @@ ALTER TABLE ONLY forum.thread
 --
 -- PostgreSQL database dump complete
 --
-

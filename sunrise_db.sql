@@ -46,13 +46,53 @@ ALTER SEQUENCE forum.forum_id_seq OWNED BY forum.forum.id;
 
 
 --
+-- Name: post; Type: TABLE; Schema: forum; Owner: postgres
+--
+
+CREATE TABLE forum.post (
+    id integer NOT NULL,
+    author text NOT NULL,
+    created timestamp with time zone,
+    forum text NOT NULL,
+    isedited boolean DEFAULT false NOT NULL,
+    message text NOT NULL,
+    parent integer DEFAULT 0 NOT NULL,
+    thread integer NOT NULL
+);
+
+
+ALTER TABLE forum.post OWNER TO postgres;
+
+--
+-- Name: post_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
+--
+
+CREATE SEQUENCE forum.post_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE forum.post_id_seq OWNER TO postgres;
+
+--
+-- Name: post_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
+--
+
+ALTER SEQUENCE forum.post_id_seq OWNED BY forum.post.id;
+
+
+--
 -- Name: thread; Type: TABLE; Schema: forum; Owner: postgres
 --
 
 CREATE TABLE forum.thread (
     id integer NOT NULL,
     author text NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created timestamp with time zone,
     forum text NOT NULL,
     message text NOT NULL,
     slug text,
@@ -130,6 +170,13 @@ ALTER TABLE ONLY forum.forum ALTER COLUMN id SET DEFAULT nextval('forum.forum_id
 
 
 --
+-- Name: post id; Type: DEFAULT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post ALTER COLUMN id SET DEFAULT nextval('forum.post_id_seq'::regclass);
+
+
+--
 -- Name: thread id; Type: DEFAULT; Schema: forum; Owner: postgres
 --
 
@@ -147,21 +194,28 @@ ALTER TABLE ONLY forum."user" ALTER COLUMN id SET DEFAULT nextval('forum.user_id
 -- Name: forum_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.forum_id_seq', 1, true);
+SELECT pg_catalog.setval('forum.forum_id_seq', 1235, true);
+
+
+--
+-- Name: post_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
+--
+
+SELECT pg_catalog.setval('forum.post_id_seq', 26, true);
 
 
 --
 -- Name: table_name_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.table_name_id_seq', 1, true);
+SELECT pg_catalog.setval('forum.table_name_id_seq', 1965, true);
 
 
 --
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.user_id_seq', 5, true);
+SELECT pg_catalog.setval('forum.user_id_seq', 10484, true);
 
 
 --
@@ -170,6 +224,14 @@ SELECT pg_catalog.setval('forum.user_id_seq', 5, true);
 
 ALTER TABLE ONLY forum.forum
     ADD CONSTRAINT forum_pk PRIMARY KEY (id);
+
+
+--
+-- Name: post post_pk; Type: CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post
+    ADD CONSTRAINT post_pk PRIMARY KEY (id);
 
 
 --
@@ -200,6 +262,13 @@ CREATE UNIQUE INDEX forum_id_uindex ON forum.forum USING btree (id);
 --
 
 CREATE UNIQUE INDEX forum_slug_uindex ON forum.forum USING btree (slug);
+
+
+--
+-- Name: post_id_uindex; Type: INDEX; Schema: forum; Owner: postgres
+--
+
+CREATE UNIQUE INDEX post_id_uindex ON forum.post USING btree (id);
 
 
 --
@@ -243,6 +312,22 @@ CREATE UNIQUE INDEX user_nickname_uindex ON forum."user" USING btree (nickname);
 
 ALTER TABLE ONLY forum.forum
     ADD CONSTRAINT forum_user_nickname_fk FOREIGN KEY ("user") REFERENCES forum."user"(nickname);
+
+
+--
+-- Name: post post_thread_id_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post
+    ADD CONSTRAINT post_thread_id_fk FOREIGN KEY (thread) REFERENCES forum.thread(id);
+
+
+--
+-- Name: post post_user_nickname_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.post
+    ADD CONSTRAINT post_user_nickname_fk FOREIGN KEY (author) REFERENCES forum."user"(nickname);
 
 
 --
