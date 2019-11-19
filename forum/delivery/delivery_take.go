@@ -49,6 +49,9 @@ func (h *HandlersStruct) TakeForumThreads(ctx echo.Context) (Err error) {
 	if limit == "" {
 		limit = "100"
 	}
+	if desc == "" {
+		desc = "false"
+	}
 
 	forums, err := h.Use.GetForumsBySlug(ctx.Param("slug"))
 

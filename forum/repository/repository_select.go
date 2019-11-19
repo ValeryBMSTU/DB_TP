@@ -28,35 +28,35 @@ func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, E
 	return forums, nil
 }
 
-func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads []models.Thread, Err error) {
-	var threads []models.Thread
+func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error) {
+	threads := models.Threads{}
 	var rows *sql.Rows
 	var err error
-	if since == "" && desc == "" {
+	if since == "" && desc == "false" {
 		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForum, forum, limit)
-	} else if since != "" && desc == "" {
-		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumSince, forum, limit)
-	} else if since == "" && desc != "" {
+	} else if since != "" && desc == "false" {
+		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumSince, forum, limit, since)
+	} else if since == "" && desc == "true" {
 		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumDesc, forum, limit)
 	} else {
-		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumSinceDesc, forum, limit)
+		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForumSinceDesc, forum, limit, since)
 	}
 	defer rows.Close()
 	if err != nil {
-		return threads, err
+		return &threads, err
 	}
 
-	scanThread := models.Thread{}
 	for rows.Next() {
+		scanThread := models.Thread{}
 		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
 			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
 			&scanThread.Votes)
 		if err != nil {
-			return threads, err
+			return &threads, err
 		}
-		threads = append(threads, scanThread)
+		threads = append(threads, &scanThread)
 	}
-	return threads, nil
+	return &threads, nil
 }
 
 func (rep *ReposStruct) SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error) {

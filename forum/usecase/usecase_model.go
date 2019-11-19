@@ -23,7 +23,7 @@ type UseInterface interface {
 	GetForumsBySlug(slug string) (forum []models.Forum, Err error)
 
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
-	GetThreadsByForum(forum string, limit string, since string, desc string) (Threads []models.Thread, Err error)
+	GetThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error)
 
 	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
 	GetUserByNickname(nickname string) (user models.User, Err error)

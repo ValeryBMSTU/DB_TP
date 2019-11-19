@@ -18,6 +18,27 @@ type Forum struct {
 
 // ==============================
 
+type NewPost struct {
+	Author string `json:"author"`
+	Message string `json:"message"`
+	Parent int `json:"parent"`
+}
+
+type Post struct {
+	Author string `json:"author"`
+	Created string `json:"created"`
+	Forum string `json:"forum"`
+	ID int `json:"id"`
+	IsEdited bool `json:"isEdited"`
+	Message string `json:"message"`
+	Parent int `json:"parent"`
+	Thread int `jsin:"thread"`
+}
+
+type Posts []*Post
+
+// ==============================
+
 type NewThread struct {
 	Author string `json:"author"`
 	Created string `json:"created"`
@@ -36,6 +57,8 @@ type Thread struct {
 	Title string `json:"title"`
 	Votes int `json:"votes"`
 }
+
+type Threads []*Thread
 
 // ==============================
 
@@ -56,5 +79,11 @@ type User struct {
 
 type Error struct {
 	Message string `json:"message"`
+}
+
+// ==============================
+
+type Body struct {
+	Body interface{}
 }
 
