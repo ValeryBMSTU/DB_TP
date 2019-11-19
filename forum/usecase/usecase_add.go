@@ -1,7 +1,9 @@
 package usecase
 
 import (
+	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"strconv"
 )
 
 func (use *UseStruct) AddForum(newForum models.NewForum) (Forum models.Forum, Err error) {
@@ -27,7 +29,59 @@ func (use *UseStruct) AddForum(newForum models.NewForum) (Forum models.Forum, Er
 	return forum ,nil
 }
 
+func (use *UseStruct) AddPosts(newPosts models.NewPosts, slug_or_id string) (Posts models.Posts, Err error) {
+	var forum string
+	id, err := strconv.Atoi(slug_or_id)
+	if err != nil {
+		threads, err := use.Rep.SelectThreadsBySlug(slug_or_id)
+		if err != nil {
+			return models.Posts{}, err
+		}
+		if len(*threads) != 1 {
+			return models.Posts{}, nil
+		}
+		forum = (*threads)[0].Forum
+		id = (*threads)[0].ID
+	} else {
+		threads, err := use.Rep.SelectThreadsByID(id)
+		if err != nil {
+			return models.Posts{}, err
+		}
+		if len(*threads) != 1 {
+			return models.Posts{}, nil
+		}
+		forum = (*threads)[0].Forum
+		id = (*threads)[0].ID
+	}
+
+	posts := models.Posts{}
+
+	for _, newPost := range newPosts {
+		lastID, threadID, err := use.Rep.InsertPost(*newPost, id, forum)
+		if err != nil {
+			return models.Posts{}, err
+		}
+		post := models.Post{
+			Author:   newPost.Author,
+			Created:  "",
+			Forum:    forum,
+			ID:       lastID,
+			IsEdited: false,
+			Message:  newPost.Message,
+			Parent:   newPost.Parent,
+			Thread:   threadID,
+		}
+		posts = append(posts, &post)
+	}
+	return  posts, nil
+}
+
 func (use *UseStruct) AddThread(newThread models.NewThread, forum string) (Thread models.Thread, Err error) {
+
+	threads, err := use.Rep.SelectThreadsBySlug(newThread.Slug)
+	if len(*threads) > 0 {
+		return *(*threads)[0], errors.New("conflict")
+	}
 	lastID, err := use.Rep.InsertThread(newThread, forum)
 	if err != nil {
 		return models.Thread{}, err

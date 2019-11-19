@@ -14,7 +14,11 @@ type ReposInterface interface {
 	InsertForum(newForum models.NewForum) (Err error)
 	SelectForumsBySlug(slug string) (forum []models.Forum, Err error)
 
+	InsertPost(newPost models.NewPost, id int, forum string) (LastID int, Thread int, Err error)
+
 	InsertThread(newThread models.NewThread, forum string) (LastID int, Err error)
+	SelectThreadsBySlug(slug string) (threads *models.Threads, Err error)
+	SelectThreadsByID(id int) (threads *models.Threads, Err error)
 	SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error)
 
 	InsertUser(newUser models.NewUser, nickname string) (Err error)

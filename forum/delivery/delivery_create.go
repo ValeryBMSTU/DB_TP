@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -62,6 +63,34 @@ func (h *HandlersStruct) CreateForum(ctx echo.Context) (Err error) {
 	return nil
 }
 
+func (h *HandlersStruct) CreatePosts(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	decoder := json.NewDecoder(ctx.Request().Body)
+
+	newPosts := models.NewPosts{}
+
+	if err := decoder.Decode(&newPosts); err != nil {
+		return err
+	}
+
+	posts, err := h.Use.AddPosts(newPosts, ctx.Param("slug_or_id"))
+	if err != nil {
+		return err
+	}
+
+	if err := ctx.JSON(201, posts); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (h *HandlersStruct) CreateThread(ctx echo.Context) (Err error) {
 	defer func() {
 		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
@@ -78,8 +107,51 @@ func (h *HandlersStruct) CreateThread(ctx echo.Context) (Err error) {
 		return err
 	}
 
-	thread, err := h.Use.AddThread(newThread, ctx.Param("slug"))
+	forum := ctx.Param("slug")
+
+	users, err := h.Use.GetUsersByNicknameOrEmail("", newThread.Author)
 	if err != nil {
+		return err
+	}
+	if len(users) > 0 {
+		newThread.Author = users[0].Nickname
+	} else {
+		if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
+			return err
+		}
+		return nil
+	}
+	forums, err := h.Use.GetForumsBySlug(forum)
+	if err != nil {
+		return err
+	}
+	if len(forums) > 0 {
+		forum= forums[0].Slug
+	} else {
+		if err := ctx.JSON(404, models.Error{"Can't find forum"}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	thread, err := h.Use.AddThread(newThread, forum)
+	if err != nil {
+		if err.Error() == "conflict" {
+			if err := ctx.JSON(409, thread); err != nil {
+				return err
+			}
+			return nil
+		}
+		pqErr, ok := err.(*pq.Error)
+		if !ok {
+			return err
+		}
+		if pqErr.Code == "23503" {
+			if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
+				return err
+			}
+			return nil
+		}
 		return err
 	}
 

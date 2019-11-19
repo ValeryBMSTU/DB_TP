@@ -16,6 +16,17 @@ func (rep *ReposStruct) InsertForum(newForum models.NewForum) (Err error) {
 	return nil
 }
 
+func (rep *ReposStruct) InsertPost(newPost models.NewPost, id int, forum string) (LastID int, ThreadID int, Err error) {
+	var lastID, threadID int
+	err := rep.DataBase.QueryRow(consts.INSERTPost, newPost.Author, newPost.Message,
+		newPost.Parent, id, forum).Scan(&lastID, &threadID)
+
+	if err != nil {
+		return lastID, threadID, err
+	}
+	return lastID, threadID,nil
+}
+
 func (rep *ReposStruct) InsertThread(newThread models.NewThread, forum string) (LastID int, Err error) {
 	var lastID int
 	if newThread.Slug == "" {

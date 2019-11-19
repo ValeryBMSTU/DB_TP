@@ -32,8 +32,10 @@ type Post struct {
 	IsEdited bool `json:"isEdited"`
 	Message string `json:"message"`
 	Parent int `json:"parent"`
-	Thread int `jsin:"thread"`
+	Thread int `json:"thread"`
 }
+
+type NewPosts []*NewPost
 
 type Posts []*Post
 

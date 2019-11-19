@@ -28,6 +28,55 @@ func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, E
 	return forums, nil
 }
 
+func (rep *ReposStruct) SelectThreadsBySlug(slug string) (Threads *models.Threads, Err error) {
+	threads := models.Threads{}
+
+
+	rows, err := rep.DataBase.Query(consts.SELECTThreadsBySlug, slug)
+
+	defer rows.Close()
+	if err != nil {
+		return &threads, err
+	}
+
+	for rows.Next() {
+		scanThread := models.Thread{}
+		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
+			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
+			&scanThread.Votes)
+		if err != nil {
+			return &threads, err
+		}
+		threads = append(threads, &scanThread)
+	}
+	return &threads, nil
+}
+
+func (rep *ReposStruct) SelectThreadsByID(id int) (Threads *models.Threads, Err error) {
+	threads := models.Threads{}
+
+
+	rows, err := rep.DataBase.Query(consts.SELECTThreadsByID, id)
+
+	defer rows.Close()
+	if err != nil {
+		return &threads, err
+	}
+
+	for rows.Next() {
+		scanThread := models.Thread{}
+		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
+			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
+			&scanThread.Votes)
+		if err != nil {
+			return &threads, err
+		}
+		threads = append(threads, &scanThread)
+	}
+	return &threads, nil
+}
+
+
 func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error) {
 	threads := models.Threads{}
 	var rows *sql.Rows

@@ -22,6 +22,8 @@ type UseInterface interface {
 	AddForum(newForum models.NewForum) (forum models.Forum, Err error)
 	GetForumsBySlug(slug string) (forum []models.Forum, Err error)
 
+	AddPosts(newPosts models.NewPosts, slug_or_id string) (posts models.Posts, Err error)
+
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
 	GetThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error)
 

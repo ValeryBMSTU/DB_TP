@@ -11,6 +11,9 @@ const (
 	SELECTForumsBySlug   = `SELECT f.posts, f.slug, f.threads, f.title, f.user ` +
 		`FROM forum.forum as f WHERE lower(f.slug) = lower($1);`
 
+	INSERTPost = "INSERT INTO forum.post (author, message, parent, thread, forum) " +
+		"VALUES ($1,$2,$3,$4,$5) RETURNING id, thread;"
+
 	INSERTThread = `INSERT INTO forum.thread (author, created, message, title, forum) values ($1,$2,$3,$4,$5) RETURNING id;`
 	INSERTThreadWithoutCreated = `INSERT INTO forum.thread (author, message, title, forum) values ($1,$2,$3,$4) RETURNING id;`
 	INSERTThreadWithSlugWithoutCreated = `INSERT INTO forum.thread (author, message, title, forum, slug) values ($1,$2,$3,$4,$5) RETURNING id;`
@@ -23,6 +26,10 @@ const (
 		`FROM forum.thread as t WHERE lower(t.forum) = lower($1) ORDER BY created DESC LIMIT $2;`
 	SELECTThreadsByForumSinceDesc = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
 		`FROM forum.thread as t WHERE lower(t.forum) = lower($1) AND t.created <= $3 ORDER BY created DESC LIMIT $2;`
+	SELECTThreadsBySlug = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
+		`FROM forum.thread as t WHERE lower(t.slug) = lower($1);`
+	SELECTThreadsByID = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
+		`FROM forum.thread as t WHERE t.id = $1;`
 
 	INSERTUser              = "INSERT INTO forum.user (about, email, fullname, nickname) values ($1,$2,$3,$4) RETURNING id;"
 	SELECTUsersByNickname   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
