@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"time"
 )
 
 func (rep *ReposStruct) InsertForum(newForum models.NewForum) (Err error) {
@@ -16,7 +17,7 @@ func (rep *ReposStruct) InsertForum(newForum models.NewForum) (Err error) {
 	return nil
 }
 
-func (rep *ReposStruct) InsertPost(newPost models.NewPost, id int, forum string) (LastID int, ThreadID int, Err error) {
+func (rep *ReposStruct) InsertPost(newPost models.NewPost, id int, forum string, created time.Time) (LastID int, ThreadID int, Err error) {
 	var lastID, threadID int
 	err := rep.DataBase.QueryRow(consts.INSERTPost, newPost.Author, newPost.Message,
 		newPost.Parent, id, forum).Scan(&lastID, &threadID)
@@ -56,6 +57,17 @@ func (rep *ReposStruct) InsertUser(newUser models.NewUser, nickname string) (Err
 	var lastID int
 	err := rep.DataBase.QueryRow(consts.INSERTUser, newUser.About, newUser.Email,
 		newUser.Fullname, nickname).Scan(&lastID)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (rep *ReposStruct) InsertVote(newVote models.NewVote, threadID int) (Err error) {
+	var lastID int
+	err := rep.DataBase.QueryRow(consts.INSERTVote, newVote.Nickname, newVote.Voice,
+		threadID).Scan(&lastID)
 
 	if err != nil {
 		return err

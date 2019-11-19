@@ -28,6 +28,34 @@ func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, E
 	return forums, nil
 }
 
+func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc string) (Posts models.Posts, Err error) {
+
+	var rows *sql.Rows
+	var err error
+	if sort == "flat" {
+		rows, err = rep.DataBase.Query(consts.SELECTPostsFlat, threadID, limit)
+	} else if sort == "tree" {
+		rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit)
+	}
+	defer rows.Close()
+	if err != nil {
+		return Posts, err
+	}
+
+	for rows.Next() {
+		scanPost := models.Post{}
+		err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+			&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
+			&scanPost.Thread)
+		if err != nil {
+			return Posts, err
+		}
+		Posts = append(Posts, &scanPost)
+	}
+
+	return Posts, nil
+}
+
 func (rep *ReposStruct) SelectThreadsBySlug(slug string) (Threads *models.Threads, Err error) {
 	threads := models.Threads{}
 

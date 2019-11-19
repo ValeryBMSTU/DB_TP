@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"time"
 )
 
 type ReposStruct struct {
@@ -14,7 +15,8 @@ type ReposInterface interface {
 	InsertForum(newForum models.NewForum) (Err error)
 	SelectForumsBySlug(slug string) (forum []models.Forum, Err error)
 
-	InsertPost(newPost models.NewPost, id int, forum string) (LastID int, Thread int, Err error)
+	InsertPost(newPost models.NewPost, id int, forum string, created time.Time) (LastID int, Thread int, Err error)
+	SelectPosts(threadID int, limit, since, sort, desc string) (Posts models.Posts, Err error)
 
 	InsertThread(newThread models.NewThread, forum string) (LastID int, Err error)
 	SelectThreadsBySlug(slug string) (threads *models.Threads, Err error)
@@ -26,4 +28,7 @@ type ReposInterface interface {
 	SelectUsersByEmail(email string) (Users []models.User, Err error)
 	SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error)
 	UpdateUser(newProfile models.NewUser, nickname string) (Err error)
+
+	InsertVote(newVote models.NewVote, id int) (Err error)
+	UpdateVote(newVote models.NewVote, id int) (Err error)
 }

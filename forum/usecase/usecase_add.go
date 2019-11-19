@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"strconv"
+	"time"
 )
 
 func (use *UseStruct) AddForum(newForum models.NewForum) (Forum models.Forum, Err error) {
@@ -55,9 +56,10 @@ func (use *UseStruct) AddPosts(newPosts models.NewPosts, slug_or_id string) (Pos
 	}
 
 	posts := models.Posts{}
+	created := time.Now()
 
 	for _, newPost := range newPosts {
-		lastID, threadID, err := use.Rep.InsertPost(*newPost, id, forum)
+		lastID, threadID, err := use.Rep.InsertPost(*newPost, id, forum, created)
 		if err != nil {
 			return models.Posts{}, err
 		}

@@ -221,4 +221,32 @@ func (h *HandlersStruct) CreateUser(ctx echo.Context) (Err error) {
 	return nil
 }
 
+func (h *HandlersStruct) CreateVote(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	decoder := json.NewDecoder(ctx.Request().Body)
+
+	slugOrID := ctx.Param("slug_or_id")
+	newVote:= models.NewVote{}
+
+	if err := decoder.Decode(&newVote); err != nil {
+		return err
+	}
+
+	thread, err := h.Use.SetVote(newVote, slugOrID)
+	if err != nil {
+		return err
+	}
+
+	if err := ctx.JSON(200, thread); err != nil {
+		return err
+	}
+
+	return nil
+}
 

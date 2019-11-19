@@ -79,6 +79,13 @@ type User struct {
 
 // ==============================
 
+type NewVote struct {
+	Nickname string `json:"nickname"`
+	Voice int `json:"voice"`
+}
+
+// ==============================
+
 type Error struct {
 	Message string `json:"message"`
 }

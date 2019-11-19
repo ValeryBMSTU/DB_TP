@@ -15,3 +15,14 @@ func (rep *ReposStruct) UpdateUser(newProfile models.NewUser, nickname string) (
 	}
 	return nil
 }
+
+func (rep *ReposStruct) UpdateVote(newVote models.NewVote, threadID int) (Err error) {
+	rows, err := rep.DataBase.Query(consts.UPDATEVote, newVote.Voice, newVote.Nickname,
+		threadID)
+	defer rows.Close()
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
