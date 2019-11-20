@@ -102,8 +102,8 @@ const (
 		"SELECT p.author AS nickname " +
 		"FROM forum.post as p " +
 		"WHERE p.forum = $1 ) " +
-		"ORDER BY lower(u.nickname) " +
-		"LIMIT $2;"
+		//"ORDER BY lower(u.nickname) " +
+		"LIMIT 100;"
 	SELECTUsersByForumSlugDesc =   "SELECT u.about, u.email, u.fullname, u.nickname " +
 		`FROM forum."user" as u ` +
 		"WHERE u.nickname IN ( " +
@@ -114,8 +114,8 @@ const (
 		"SELECT p.author AS nickname " +
 		"FROM forum.post as p " +
 		"WHERE p.forum = $1 ) " +
-		"ORDER BY u.nickname DESC" +
-		"LIMIT $2;"
+		//"ORDER BY u.nickname DESC" +
+		"LIMIT 100;"
 
 
 UPDATEUserByNickname = "UPDATE forum.user SET about = $1, email = $2, fullname = $3 WHERE nickname = $4"

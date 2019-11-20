@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
@@ -187,15 +188,23 @@ func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since s
 	return &threads, nil
 }
 
-func (rep *ReposStruct) SelectUsersByForum(slug, limit, desc string) (Users *models.Users, Err error) {
+func (rep *ReposStruct) SelectUsersByForum(slug, limit, since, desc string) (Users *models.Users, Err error) {
 	var users models.Users
 	var rows *sql.Rows
 	var err error
-	if desc == "false" {
-		rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlug, slug, limit)
-	} else {
-		rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlugDesc, slug, limit)
-	}
+	//if since == "" {
+		if desc == "false" {
+			rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlug, slug)
+		} else {
+			rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlugDesc, slug)
+		}
+	//} else {
+	//	if desc == "false" {
+	//		rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlugSince, slug)
+	//	} else {
+	//		rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlugSinceDesc, slug)
+	//	}
+	//}
 	defer rows.Close()
 	if err != nil {
 		return &users, err
@@ -212,10 +221,33 @@ func (rep *ReposStruct) SelectUsersByForum(slug, limit, desc string) (Users *mod
 		users = append(users, &scanUser)
 	}
 
+	//ab := []byte(strings.ToLower(users[0].Nickname))
+	//	println(ab)
 
-	sort.Slice(users, func(i, j int) bool { return strings.ToLower(users[i].Nickname) < strings.ToLower(users[j].Nickname) })
+	sort.Slice(users, func(i, j int) bool { return bytes.Compare([]byte(strings.ToLower(users[i].Nickname)),[]byte(strings.ToLower(users[j].Nickname))) < 0})
 
-	return &users, nil
+
+	var resUsers models.Users
+
+	limitDigit, _ := strconv.Atoi(limit)
+	if since == "" {
+		for i := 0; i < limitDigit && i < len(users); i++ {
+			resUsers = append(resUsers, users[i])
+		}
+	} else {
+		j := 0
+		for i := 0; j < limitDigit && i < len(users); {
+			if bytes.Compare([]byte(strings.ToLower(users[i].Nickname)), []byte(strings.ToLower(since))) < 0 {
+				resUsers = append(resUsers, users[i])
+				j++
+			}
+			i++
+		}
+	}
+
+
+
+	return &resUsers, nil
 }
 
 func (rep *ReposStruct) SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error) {

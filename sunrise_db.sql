@@ -439,6 +439,7 @@ ALTER TABLE ONLY forum.vote
 -- PostgreSQL database dump complete
 --
 
+
 CREATE OR REPLACE FUNCTION vote_add() RETURNS TRIGGER AS $emp_audit$
 BEGIN
 UPDATE forum.thread
@@ -449,4 +450,39 @@ END;
 $emp_audit$ LANGUAGE plpgsql;
 
 
-CREATE TRIGGER vote_insert AFTER INSERT ON forum.vote FOR EACH ROW EXECUTE PROCEDURE public.vote_add('vote');
+CREATE OR REPLACE FUNCTION thread_add() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+    UPDATE forum.forum
+    SET threads = threads + 1
+    WHERE slug = NEW.forum;
+    RETURN NULL;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION post_add() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+    UPDATE forum.forum
+    SET posts = posts + 1
+    WHERE slug = NEW.forum;
+    RETURN NULL;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER vote_insert
+    AFTER INSERT
+    ON forum.vote
+    FOR EACH ROW EXECUTE PROCEDURE vote_add(vote);
+
+
+CREATE TRIGGER thread_insert
+  AFTER INSERT
+  ON forum.thread
+  FOR EACH ROW EXECUTE PROCEDURE thread_add();
+
+
+CREATE TRIGGER post_insert
+  AFTER INSERT
+  ON forum.post
+  FOR EACH ROW EXECUTE PROCEDURE post_add();
