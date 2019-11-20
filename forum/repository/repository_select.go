@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"strconv"
 )
 
 func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, Err error) {
@@ -28,32 +29,80 @@ func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, E
 	return forums, nil
 }
 
-func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc string) (Posts models.Posts, Err error) {
+func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
+	posts := models.Posts{}
 
 	var rows *sql.Rows
 	var err error
 	if sort == "flat" {
-		rows, err = rep.DataBase.Query(consts.SELECTPostsFlat, threadID, limit)
-	} else if sort == "tree" {
-		rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit)
-	}
-	defer rows.Close()
-	if err != nil {
-		return Posts, err
-	}
-
-	for rows.Next() {
-		scanPost := models.Post{}
-		err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
-			&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
-			&scanPost.Thread)
-		if err != nil {
-			return Posts, err
+		if desc == "false" {
+			rows, err = rep.DataBase.Query(consts.SELECTPostsFlat, threadID, limit, since)
+		} else {
+			rows, err = rep.DataBase.Query(consts.SELECTPostsFlatDesc, threadID, limit, since)
 		}
-		Posts = append(Posts, &scanPost)
+
+	} else if sort == "tree" {
+		if desc == "false" {
+			rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit, since)
+		} else {
+			rows, err = rep.DataBase.Query(consts.SELECTPostsTreeDesc, threadID, limit, since)
+		}
+	} else if sort == "parent_tree" {
+		if desc == "false" {
+			rows, err = rep.DataBase.Query(consts.SELECTPostsParentTree, threadID, since)
+		} else {
+			rows, err = rep.DataBase.Query(consts.SELECTPostsParentTreeDesc, threadID, since)
+		}
 	}
 
-	return Posts, nil
+	if sort != "parent_tree" {
+		defer rows.Close()
+		if err != nil {
+			return &posts, err
+		}
+
+		for rows.Next() {
+			scanPost := models.Post{}
+			err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+				&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
+				&scanPost.Thread)
+			if err != nil {
+				return &posts, err
+			}
+			posts = append(posts, &scanPost)
+		}
+	} else {
+		if err != nil {
+			rows.Close()
+			return &posts, err
+		}
+
+		count := 0
+		limitDigit, _ := strconv.Atoi(limit)
+
+		for rows.Next() {
+			scanPost := models.Post{}
+			err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+				&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
+				&scanPost.Thread)
+			if err != nil {
+				return &posts, err
+			}
+
+			posts = append(posts, &scanPost)
+
+			if scanPost.Parent == 0 {
+				count = count + 1
+			}
+			if count >= limitDigit {
+				rows.Close()
+				return &posts, nil
+			}
+		}
+		rows.Close()
+	}
+
+	return &posts, nil
 }
 
 func (rep *ReposStruct) SelectThreadsBySlug(slug string) (Threads *models.Threads, Err error) {

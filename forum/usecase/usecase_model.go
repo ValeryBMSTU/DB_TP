@@ -23,7 +23,7 @@ type UseInterface interface {
 	GetForumsBySlug(slug string) (forum []models.Forum, Err error)
 
 	AddPosts(newPosts models.NewPosts, slug_or_id string) (posts models.Posts, Err error)
-	GetPosts(slugOrID, limit, since, sort, desc string) (posts models.Posts, Err error)
+	GetPosts(slugOrID, limit, since, sort, desc string) (posts *models.Posts, Err error)
 
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
 	GetThreadBySlug(slugOrID string) (Thread models.Thread, Err error)

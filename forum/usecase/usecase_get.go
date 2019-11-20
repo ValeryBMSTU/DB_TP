@@ -15,26 +15,26 @@ func (use *UseStruct) GetForumsBySlug(slug string) (Forum []models.Forum, Err er
 	return forums,nil
 }
 
-func (use *UseStruct) GetPosts(slugOrID, limit, since, sort, desc string) (Posts models.Posts, Err error) {
+func (use *UseStruct) GetPosts(slugOrID, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
 
 	var thread models.Thread
 	id, err := strconv.Atoi(slugOrID)
 	if err != nil {
 		threads, err := use.Rep.SelectThreadsBySlug(slugOrID)
 		if err != nil {
-			return models.Posts{}, err
+			return &models.Posts{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Posts{}, errors.New("Can't find thread")
+			return &models.Posts{}, errors.New("Can't find thread")
 		}
 		thread = *(*threads)[0]
 	} else {
 		threads, err := use.Rep.SelectThreadsByID(id)
 		if err != nil {
-			return models.Posts{}, err
+			return &models.Posts{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Posts{}, errors.New("Can't find thread")
+			return &models.Posts{}, errors.New("Can't find thread")
 		}
 		thread = *(*threads)[0]
 	}

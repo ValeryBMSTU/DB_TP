@@ -1,3 +1,25 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.10
+-- Dumped by pg_dump version 10.10
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: forum; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
 CREATE SCHEMA forum;
 
 
@@ -6,6 +28,20 @@ ALTER SCHEMA forum OWNER TO postgres;
 SET default_tablespace = '';
 
 SET default_with_oids = false;
+
+--
+-- Name: vote; Type: TABLE; Schema: forum; Owner: postgres
+--
+
+CREATE TABLE forum.vote (
+    id integer NOT NULL,
+    nickname text NOT NULL,
+    voice smallint NOT NULL,
+    thread integer NOT NULL
+);
+
+
+ALTER TABLE forum.vote OWNER TO postgres;
 
 --
 -- Name: forum; Type: TABLE; Schema: forum; Owner: postgres
@@ -52,7 +88,7 @@ ALTER SEQUENCE forum.forum_id_seq OWNED BY forum.forum.id;
 CREATE TABLE forum.post (
     id integer NOT NULL,
     author text NOT NULL,
-    created timestamp with time zone,
+    created timestamp with time zone DEFAULT '1970-01-01 03:00:00+03'::timestamp with time zone NOT NULL,
     forum text NOT NULL,
     isedited boolean DEFAULT false NOT NULL,
     message text NOT NULL,
@@ -163,6 +199,28 @@ ALTER SEQUENCE forum.user_id_seq OWNED BY forum."user".id;
 
 
 --
+-- Name: vote_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
+--
+
+CREATE SEQUENCE forum.vote_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE forum.vote_id_seq OWNER TO postgres;
+
+--
+-- Name: vote_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
+--
+
+ALTER SEQUENCE forum.vote_id_seq OWNED BY forum.vote.id;
+
+
+--
 -- Name: forum id; Type: DEFAULT; Schema: forum; Owner: postgres
 --
 
@@ -191,31 +249,45 @@ ALTER TABLE ONLY forum."user" ALTER COLUMN id SET DEFAULT nextval('forum.user_id
 
 
 --
+-- Name: vote id; Type: DEFAULT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.vote ALTER COLUMN id SET DEFAULT nextval('forum.vote_id_seq'::regclass);
+
+
+--
 -- Name: forum_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.forum_id_seq', 1235, true);
+SELECT pg_catalog.setval('forum.forum_id_seq', 4184, true);
 
 
 --
 -- Name: post_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.post_id_seq', 26, true);
+SELECT pg_catalog.setval('forum.post_id_seq', 27903, true);
 
 
 --
 -- Name: table_name_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.table_name_id_seq', 1965, true);
+SELECT pg_catalog.setval('forum.table_name_id_seq', 7629, true);
 
 
 --
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('forum.user_id_seq', 10484, true);
+SELECT pg_catalog.setval('forum.user_id_seq', 23647, true);
+
+
+--
+-- Name: vote_id_seq; Type: SEQUENCE SET; Schema: forum; Owner: postgres
+--
+
+SELECT pg_catalog.setval('forum.vote_id_seq', 283, true);
 
 
 --
@@ -235,6 +307,14 @@ ALTER TABLE ONLY forum.post
 
 
 --
+-- Name: vote subscribe_subscriber_id_followee_id_key; Type: CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.vote
+    ADD CONSTRAINT subscribe_subscriber_id_followee_id_key UNIQUE (nickname, thread);
+
+
+--
 -- Name: thread table_name_pk; Type: CONSTRAINT; Schema: forum; Owner: postgres
 --
 
@@ -248,6 +328,14 @@ ALTER TABLE ONLY forum.thread
 
 ALTER TABLE ONLY forum."user"
     ADD CONSTRAINT user_pk PRIMARY KEY (id);
+
+
+--
+-- Name: vote vote_pk; Type: CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.vote
+    ADD CONSTRAINT vote_pk PRIMARY KEY (id);
 
 
 --
@@ -307,6 +395,20 @@ CREATE UNIQUE INDEX user_nickname_uindex ON forum."user" USING btree (nickname);
 
 
 --
+-- Name: vote_id_uindex; Type: INDEX; Schema: forum; Owner: postgres
+--
+
+CREATE UNIQUE INDEX vote_id_uindex ON forum.vote USING btree (id);
+
+
+--
+-- Name: vote vote_insert; Type: TRIGGER; Schema: forum; Owner: postgres
+--
+
+CREATE TRIGGER vote_insert AFTER INSERT ON forum.vote FOR EACH ROW EXECUTE PROCEDURE public.vote_add('vote');
+
+
+--
 -- Name: forum forum_user_nickname_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
 --
 
@@ -347,5 +449,22 @@ ALTER TABLE ONLY forum.thread
 
 
 --
+-- Name: vote vote_thread_id_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.vote
+    ADD CONSTRAINT vote_thread_id_fk FOREIGN KEY (thread) REFERENCES forum.thread(id);
+
+
+--
+-- Name: vote vote_user_nickname_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
+--
+
+ALTER TABLE ONLY forum.vote
+    ADD CONSTRAINT vote_user_nickname_fk FOREIGN KEY (nickname) REFERENCES forum."user"(nickname);
+
+
+--
 -- PostgreSQL database dump complete
 --
+

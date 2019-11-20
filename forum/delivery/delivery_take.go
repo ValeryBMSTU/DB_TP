@@ -152,6 +152,20 @@ func (h *HandlersStruct) TakePosts(ctx echo.Context) (Err error) {
 		limit = "100"
 	}
 
+	if sort == "" {
+		sort = "flat"
+	}
+	if desc == "" {
+		desc = "false"
+	}
+	if since == "" {
+		if desc == "false" {
+			since = "0"
+		} else {
+			since = "999999999"
+		}
+	}
+
 	posts, err := h.Use.GetPosts(slugOrID, limit, since, sort, desc)
 	if err != nil {
 		return err
