@@ -68,6 +68,8 @@ const (
 	INSERTThreadWithoutCreated = `INSERT INTO forum.thread (author, message, title, forum) values ($1,$2,$3,$4) RETURNING id;`
 	INSERTThreadWithSlugWithoutCreated = `INSERT INTO forum.thread (author, message, title, forum, slug) values ($1,$2,$3,$4,$5) RETURNING id;`
 	INSERTThreadWithSlug = `INSERT INTO forum.thread (author, created, message, title, forum, slug) values ($1,$2,$3,$4,$5,$6) RETURNING id;`
+	UPDATEThreadByID = "UPDATE forum.thread SET message = $1, title = $2 WHERE id = $3;"
+
 	SELECTThreadsByForum = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
 		`FROM forum.thread as t WHERE lower(t.forum) = lower($1) ORDER BY created LIMIT $2;`
 	SELECTThreadsByForumSince = `SELECT t.author, t.created, t.forum, t.id, t.message, t.slug, t.title, t.votes ` +
@@ -82,13 +84,43 @@ const (
 		`FROM forum.thread as t WHERE t.id = $1;`
 
 	INSERTUser              = "INSERT INTO forum.user (about, email, fullname, nickname) values ($1,$2,$3,$4) RETURNING id;"
+
+
 	SELECTUsersByNickname   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.nickname) = lower($1);`
 	SELECTUsersByEmail = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.email) = lower($1);`
 	SELECTUsersByNicknameOrEmail   = `SELECT u.about, u.email, u.fullname, u.nickname ` +
 		`FROM forum.user as u WHERE lower(u.email) = lower($1) OR lower(u.nickname) = lower($2);`
-	UPDATEUserByNickname = "UPDATE forum.user SET about = $1, email = $2, fullname = $3 WHERE nickname = $4"
+	SELECTUsersByForumSlug =   "SELECT u.about, u.email, u.fullname, u.nickname " +
+		`FROM forum."user" as u ` +
+		"WHERE u.nickname IN ( " +
+		"SELECT t.author AS nickname " +
+		"FROM forum.thread as t " +
+		"WHERE t.forum = $1 " +
+		"UNION " +
+		"SELECT p.author AS nickname " +
+		"FROM forum.post as p " +
+		"WHERE p.forum = $1 ) " +
+		"ORDER BY lower(u.nickname) " +
+		"LIMIT $2;"
+	SELECTUsersByForumSlugDesc =   "SELECT u.about, u.email, u.fullname, u.nickname " +
+		`FROM forum."user" as u ` +
+		"WHERE u.nickname IN ( " +
+		"SELECT t.author AS nickname " +
+		"FROM forum.thread as t " +
+		"WHERE t.forum = $1 " +
+		"UNION " +
+		"SELECT p.author AS nickname " +
+		"FROM forum.post as p " +
+		"WHERE p.forum = $1 ) " +
+		"ORDER BY u.nickname DESC" +
+		"LIMIT $2;"
+
+
+UPDATEUserByNickname = "UPDATE forum.user SET about = $1, email = $2, fullname = $3 WHERE nickname = $4"
+
+
 
 	INSERTVote = "INSERT INTO forum.vote (nickname, voice, thread) " +
 		"VALUES ($1,$2,$3) RETURNING id;"

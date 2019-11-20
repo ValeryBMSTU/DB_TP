@@ -6,6 +6,51 @@ import (
 	"strconv"
 )
 
+func (use *UseStruct) SetThread(changeThread models.ChangeThread, slugOrID string) (Thread models.Thread, Err error) {
+	thread := models.Thread{}
+	id, err := strconv.Atoi(slugOrID)
+	if err != nil {
+		threads, err := use.Rep.SelectThreadsBySlug(slugOrID)
+		if err != nil {
+			return models.Thread{}, err
+		}
+		if len(*threads) != 1 {
+			return models.Thread{}, nil
+		}
+		thread = *(*threads)[0]
+		id = (*threads)[0].ID
+	} else {
+		threads, err := use.Rep.SelectThreadsByID(id)
+		if err != nil {
+			return models.Thread{}, err
+		}
+		if len(*threads) != 1 {
+			return models.Thread{}, nil
+		}
+		thread = *(*threads)[0]
+		id = (*threads)[0].ID
+	}
+
+	if changeThread.Message == "" {
+		changeThread.Message = thread.Message
+	} else {
+		thread.Message = changeThread.Message
+	}
+	if changeThread.Title == "" {
+		changeThread.Title = thread.Title
+	} else {
+		thread.Title = changeThread.Title
+	}
+
+	if err := use.Rep.UpdateThread(changeThread, id); err != nil {
+		return models.Thread{}, err
+	}
+
+
+
+	return thread, nil
+}
+
 func (use *UseStruct) SetUser(newProfile models.NewUser, nickname string) (User models.User, Err error) {
 	curentUser, err := use.Rep.SelectUserByNickname(nickname)
 	if err != nil {

@@ -33,7 +33,7 @@ func (RS *ReposStruct) DataBaseInit() error {
 		}
 	}
 
-	RS.Cleare()
+	//RS.Cleare()
 
 	return nil
 }

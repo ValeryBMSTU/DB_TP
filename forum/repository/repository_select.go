@@ -5,7 +5,9 @@ import (
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, Err error) {
@@ -183,6 +185,37 @@ func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since s
 		threads = append(threads, &scanThread)
 	}
 	return &threads, nil
+}
+
+func (rep *ReposStruct) SelectUsersByForum(slug, limit, desc string) (Users *models.Users, Err error) {
+	var users models.Users
+	var rows *sql.Rows
+	var err error
+	if desc == "false" {
+		rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlug, slug, limit)
+	} else {
+		rows, err = rep.DataBase.Query(consts.SELECTUsersByForumSlugDesc, slug, limit)
+	}
+	defer rows.Close()
+	if err != nil {
+		return &users, err
+	}
+
+
+	for rows.Next() {
+		scanUser := models.User{}
+		err := rows.Scan(&scanUser.About, &scanUser.Email, &scanUser.Fullname,
+			&scanUser.Nickname)
+		if err != nil {
+			return &users, err
+		}
+		users = append(users, &scanUser)
+	}
+
+
+	sort.Slice(users, func(i, j int) bool { return strings.ToLower(users[i].Nickname) < strings.ToLower(users[j].Nickname) })
+
+	return &users, nil
 }
 
 func (rep *ReposStruct) SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error) {

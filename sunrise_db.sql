@@ -1,25 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 10.10
--- Dumped by pg_dump version 10.10
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: forum; Type: SCHEMA; Schema: -; Owner: postgres
---
-
 CREATE SCHEMA forum;
 
 
@@ -402,13 +380,6 @@ CREATE UNIQUE INDEX vote_id_uindex ON forum.vote USING btree (id);
 
 
 --
--- Name: vote vote_insert; Type: TRIGGER; Schema: forum; Owner: postgres
---
-
-CREATE TRIGGER vote_insert AFTER INSERT ON forum.vote FOR EACH ROW EXECUTE PROCEDURE public.vote_add('vote');
-
-
---
 -- Name: forum forum_user_nickname_fk; Type: FK CONSTRAINT; Schema: forum; Owner: postgres
 --
 
@@ -468,3 +439,14 @@ ALTER TABLE ONLY forum.vote
 -- PostgreSQL database dump complete
 --
 
+CREATE OR REPLACE FUNCTION vote_add() RETURNS TRIGGER AS $emp_audit$
+BEGIN
+UPDATE forum.thread
+SET votes = votes + NEW.voice
+WHERE id = NEW.thread;
+RETURN NULL;
+END;
+$emp_audit$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER vote_insert AFTER INSERT ON forum.vote FOR EACH ROW EXECUTE PROCEDURE public.vote_add('vote');

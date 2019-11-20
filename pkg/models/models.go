@@ -49,6 +49,11 @@ type NewThread struct {
 	Title string `json:"title"`
 }
 
+type ChangeThread struct {
+	Message string `json:"message"`
+	Title string `json:"title"`
+}
+
 type Thread struct {
 	Author string `json:"author"`
 	Created string `json:"created"`
@@ -76,6 +81,8 @@ type User struct {
 	Fullname string `json:"fullname"`
 	Nickname string `json:"nickname"`
 }
+
+type Users []*User
 
 // ==============================
 

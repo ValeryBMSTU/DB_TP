@@ -194,26 +194,6 @@ func (h *HandlersStruct) CreateUser(ctx echo.Context) (Err error) {
 		return err
 	}
 
-
-	//if err != nil {
-	//	pqErr, ok := err.(*pq.Error)
-	//	if !ok {
-	//		return err
-	//	}
-	//	if pqErr.Message == `повторяющееся значение ключа нарушает ограничение уникальности "user_nickname_uindex"` ||
-	//		pqErr.Code == "23505" {
-	//		users, err := h.Use.GetUsersByNicknameOrEmail(newUser.Email,ctx.Param("nickname"))
-	//		if err != nil {
-	//			return err
-	//		}
-	//		if err := ctx.JSON(409, users); err != nil {
-	//			return err
-	//		}
-	//		return nil
-	//	}
-	//	return err
-	//}
-
 	if err := ctx.JSON(201, user); err != nil {
 		return err
 	}

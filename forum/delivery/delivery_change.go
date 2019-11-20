@@ -7,6 +7,36 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (h *HandlersStruct) ChangeThread(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	decoder := json.NewDecoder(ctx.Request().Body)
+
+	changeThread := models.ChangeThread{}
+
+	if err := decoder.Decode(&changeThread); err != nil {
+		return err
+	}
+
+	slugOrID := ctx.Param( "slug_or_id")
+
+	thread, err := h.Use.SetThread(changeThread, slugOrID)
+	if err != nil {
+		return err
+	}
+
+	if err := ctx.JSON(200, thread); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (h *HandlersStruct) ChangeUser(ctx echo.Context) (Err error) {
 	defer func() {
 		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {

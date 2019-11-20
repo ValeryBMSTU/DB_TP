@@ -26,10 +26,12 @@ type UseInterface interface {
 	GetPosts(slugOrID, limit, since, sort, desc string) (posts *models.Posts, Err error)
 
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
+	SetThread(changeThread models.ChangeThread, slugOrID string) (Thread models.Thread, Err error)
 	GetThreadBySlug(slugOrID string) (Thread models.Thread, Err error)
 	GetThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error)
 
 	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
+	GetUsersByForum(slug, limit, desc string) (Users *models.Users, Err error)
 	GetUserByNickname(nickname string) (user models.User, Err error)
 	GetUsersByEmail(email string) (user []models.User, Err error)
 	GetUsersByNicknameOrEmail(email string, nickname string) (user []models.User, Err error)
