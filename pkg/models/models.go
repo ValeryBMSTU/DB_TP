@@ -39,6 +39,20 @@ type Post struct {
 	Thread int `json:"thread"`
 }
 
+type EditedPost struct {
+	Author string `json:"author"`
+	Created string `json:"created"`
+	Forum string `json:"forum"`
+	ID int `json:"id"`
+	Message string `json:"message"`
+	Parent int `json:"parent"`
+	Thread int `json:"thread"`
+}
+
+type PostDetails struct {
+	Post interface{} `json:"post"`
+}
+
 type NewPosts []*NewPost
 
 type Posts []*Post
@@ -87,6 +101,16 @@ type User struct {
 }
 
 type Users []*User
+
+// ==============================
+
+
+type Status struct {
+	Post int `json:"post"`
+	Thread int `json:"thread"`
+	User	int `json:"user"`
+	Forum int `json:"forum"`
+}
 
 // ==============================
 

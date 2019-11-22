@@ -32,7 +32,10 @@ func (h *HandlersStruct) ChangePost(ctx echo.Context) (Err error) {
 
 	post, err := h.Use.SetPost(changePost, postID)
 	if err != nil {
-		return err
+		if err := ctx.JSON(404, models.Error{"Can't find post"}); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if err := ctx.JSON(200, post); err != nil {
@@ -62,7 +65,10 @@ func (h *HandlersStruct) ChangeThread(ctx echo.Context) (Err error) {
 
 	thread, err := h.Use.SetThread(changeThread, slugOrID)
 	if err != nil {
-		return err
+		if err := ctx.JSON(404, models.Error{"Can't find thread"}); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if err := ctx.JSON(200, thread); err != nil {

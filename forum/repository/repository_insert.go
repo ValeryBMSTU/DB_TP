@@ -74,3 +74,13 @@ func (rep *ReposStruct) InsertVote(newVote models.NewVote, threadID int) (Err er
 	}
 	return nil
 }
+
+func (rep *ReposStruct) Cleare() (Err error) {
+	rows, err := rep.DataBase.Query(consts.CLEARE)
+	defer rows.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

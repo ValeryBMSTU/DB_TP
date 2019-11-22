@@ -88,20 +88,20 @@ func (RS *ReposStruct) CloseDB() error {
 	return nil
 }
 
-func (rep *ReposStruct) Cleare() {
-
-	rows, _ := rep.DataBase.Query(consts.DeletePosts)
-	rows.Close()
-	rows, _ = rep.DataBase.Query(consts.DeleteVotes)
-	rows.Close()
-	rows, _ = rep.DataBase.Query(consts.DeleteThreads)
-	rows.Close()
-	rows, _ = rep.DataBase.Query(consts.DeleteForums)
-	rows.Close()
-	rows, _ = rep.DataBase.Query(consts.DeleteUsers)
-	rows.Close()
-	return
-}
+//func (rep *ReposStruct) Cleare() {
+//
+//	rows, _ := rep.DataBase.Query(consts.DeletePosts)
+//	rows.Close()
+//	rows, _ = rep.DataBase.Query(consts.DeleteVotes)
+//	rows.Close()
+//	rows, _ = rep.DataBase.Query(consts.DeleteThreads)
+//	rows.Close()
+//	rows, _ = rep.DataBase.Query(consts.DeleteForums)
+//	rows.Close()
+//	rows, _ = rep.DataBase.Query(consts.DeleteUsers)
+//	rows.Close()
+//	return
+//}
 //
 //func (RS *ReposStruct) SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error) {
 //	usersSlice := make([]models.User, 0)

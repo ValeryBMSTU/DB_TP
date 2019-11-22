@@ -57,6 +57,31 @@ func (rep *ReposStruct) SelectPostByID(ID int) (Post models.Post, Err error) {
 	return posts[0], nil
 }
 
+func (rep *ReposStruct) SelectPostByIDThreadID(ID int, threadID int) (Post models.Post, Err error) {
+	var posts []models.Post
+	rows, err := rep.DataBase.Query(consts.SELECTPostsByIDThreadID, ID, threadID)
+	defer rows.Close()
+	if err != nil {
+		return models.Post{}, err
+	}
+
+	scanPost := models.Post{}
+	for rows.Next() {
+		err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+			&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
+			&scanPost.Thread)
+		if err != nil {
+			return models.Post{}, err
+		}
+		posts = append(posts, scanPost)
+	}
+
+	if len(posts) == 0 {
+		return models.Post{}, errors.New("Can't find user by nickname")
+	}
+	return posts[0], nil
+}
+
 func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
 	posts := models.Posts{}
 
@@ -72,9 +97,9 @@ func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc strin
 	} else if sort == "tree" {
 		if desc == "false" {
 			if since != "0" && since != "999999999" {
-				rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID,  100000, 0)
+				rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID,  100000)
 			} else {
-				rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit, 0)
+				rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit)
 			}
 		} else {
 			if since != "0" && since != "999999999" {
@@ -504,5 +529,13 @@ func (rep *ReposStruct) SelectUsersByEmail(email string) (Users []models.User, E
 		users = append(users, scanUser)
 	}
 	return users, nil
+}
+
+func (rep *ReposStruct) SelectStatus() (Status models.Status, Err error) {
+	err := rep.DataBase.QueryRow(consts.SELECTStatus).Scan(&Status.Post, &Status.Thread, &Status.User, &Status.Forum)
+	if err != nil {
+		return Status, err
+	}
+	return
 }
 

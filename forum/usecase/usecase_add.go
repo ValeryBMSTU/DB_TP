@@ -39,7 +39,7 @@ func (use *UseStruct) AddPosts(newPosts models.NewPosts, slug_or_id string) (Pos
 			return models.Posts{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Posts{}, nil
+			return models.Posts{}, errors.New("Can't find thread")
 		}
 		forum = (*threads)[0].Forum
 		id = (*threads)[0].ID
@@ -49,7 +49,7 @@ func (use *UseStruct) AddPosts(newPosts models.NewPosts, slug_or_id string) (Pos
 			return models.Posts{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Posts{}, nil
+			return models.Posts{},  errors.New("Can't find thread")
 		}
 		forum = (*threads)[0].Forum
 		id = (*threads)[0].ID
@@ -59,6 +59,13 @@ func (use *UseStruct) AddPosts(newPosts models.NewPosts, slug_or_id string) (Pos
 	created := time.Now()
 
 	for _, newPost := range newPosts {
+		if newPost.Parent != 0 {
+			_, err := use.Rep.SelectPostByIDThreadID(newPost.Parent, id)
+			if err != nil {
+				return models.Posts{}, err
+			}
+		}
+
 		lastID, threadID, err := use.Rep.InsertPost(*newPost, id, forum, created)
 		if err != nil {
 			return models.Posts{}, err
@@ -116,4 +123,13 @@ func (use *UseStruct) AddUser(newUser models.NewUser, nickname string) (User mod
 	}
 
 	return user,nil
+}
+
+func (use *UseStruct) Cleare() (Err error) {
+	if err := use.Rep.Cleare(); err != nil {
+		return err
+	}
+
+
+	return nil
 }

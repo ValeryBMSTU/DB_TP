@@ -81,7 +81,23 @@ func (h *HandlersStruct) CreatePosts(ctx echo.Context) (Err error) {
 
 	posts, err := h.Use.AddPosts(newPosts, ctx.Param("slug_or_id"))
 	if err != nil {
-		return err
+		_, ok := err.(*pq.Error)
+		if !ok {
+			if err.Error() == "Can't find thread" {
+				if err := ctx.JSON(404, models.Error{"Can't find thread"}); err != nil {
+					return err
+				}
+				return nil
+			}
+			if err := ctx.JSON(409, models.Error{err.Error()}); err != nil {
+				return err
+			}
+			return  nil
+		}
+		if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if err := ctx.JSON(201, posts); err != nil {
@@ -220,7 +236,16 @@ func (h *HandlersStruct) CreateVote(ctx echo.Context) (Err error) {
 
 	thread, err := h.Use.SetVote(newVote, slugOrID)
 	if err != nil {
-		return err
+		if err.Error() == "Can't find thread" {
+			if err := ctx.JSON(404, models.Error{"Can't find thread"}); err != nil {
+				return err
+			}
+			return nil
+		}
+		if err := ctx.JSON(404, models.Error{"Can't find user"}); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if err := ctx.JSON(200, thread); err != nil {
@@ -229,4 +254,27 @@ func (h *HandlersStruct) CreateVote(ctx echo.Context) (Err error) {
 
 	return nil
 }
+
+func (h *HandlersStruct) Cleare(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	err := h.Use.Cleare()
+	if err != nil {
+		return err
+	}
+
+
+	if err := ctx.JSON(200, nil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 

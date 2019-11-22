@@ -17,6 +17,7 @@ type ReposInterface interface {
 
 	InsertPost(newPost models.NewPost, id int, forum string, created time.Time) (LastID int, Thread int, Err error)
 	SelectPostByID(ID int) (Post models.Post, Err error)
+	SelectPostByIDThreadID(ID int, threadID int) (Post models.Post, Err error)
 	SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error)
 	UpdatePost(changePost models.ChangePost, postID int) (Err error)
 
@@ -35,4 +36,8 @@ type ReposInterface interface {
 
 	InsertVote(newVote models.NewVote, id int) (Err error)
 	UpdateVote(newVote models.NewVote, id int) (Err error)
+
+	SelectStatus() (Status models.Status, Err error)
+
+	Cleare() (Err error)
 }

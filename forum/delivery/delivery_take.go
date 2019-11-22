@@ -4,6 +4,7 @@ import (
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 func (h *HandlersStruct) TakeForum(ctx echo.Context) (Err error) {
@@ -27,6 +28,33 @@ func (h *HandlersStruct) TakeForum(ctx echo.Context) (Err error) {
 	}
 
 	if err := ctx.JSON(200, forums[0]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *HandlersStruct) TakePostByID(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	ID := ctx.Param("id")
+	postID, _ := strconv.Atoi(ID)
+
+	post, err := h.Use.GetPostByID(postID)
+	if err != nil {
+		if err := ctx.JSON(404, models.Error{"Can't find post"}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if err := ctx.JSON(200, models.PostDetails{post}); err != nil {
 		return err
 	}
 
@@ -210,10 +238,32 @@ func (h *HandlersStruct) TakePosts(ctx echo.Context) (Err error) {
 
 	posts, err := h.Use.GetPosts(slugOrID, limit, since, sort, desc)
 	if err != nil {
-		return err
+		if err := ctx.JSON(404, models.Error{"Can't find thread"}); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if err := ctx.JSON(200, posts); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *HandlersStruct) TakeStatus(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+
+	status, err := h.Use.GetStatus()
+	if err != nil {
+		return err
+	}
+
+	if err := ctx.JSON(200, status); err != nil {
 		return err
 	}
 

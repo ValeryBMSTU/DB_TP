@@ -24,6 +24,7 @@ type UseInterface interface {
 
 	AddPosts(newPosts models.NewPosts, slug_or_id string) (posts models.Posts, Err error)
 	SetPost(changePost models.ChangePost, postID int) (Post models.Post, Err error)
+	GetPostByID(ID int) (Post models.Post, Err error)
 	GetPosts(slugOrID, limit, since, sort, desc string) (posts *models.Posts, Err error)
 
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
@@ -39,4 +40,8 @@ type UseInterface interface {
 	SetUser(newProfile models.NewUser, nickname string) (user models.User, Err error)
 
 	SetVote(newVote models.NewVote, slugOrID string) (Thread models.Thread, Err error)
+
+	GetStatus() (Status models.Status, Errr error)
+
+	Cleare() (Err error)
 }

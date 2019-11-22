@@ -15,6 +15,18 @@ func (use *UseStruct) GetForumsBySlug(slug string) (Forum []models.Forum, Err er
 	return forums,nil
 }
 
+func (use *UseStruct) GetPostByID(ID int) (Post models.Post, Err error) {
+	post, err := use.Rep.SelectPostByID(ID)
+
+	if err != nil {
+		return post, err
+	}
+
+	post.Created = date
+
+	return post,nil
+}
+
 func (use *UseStruct) GetPosts(slugOrID, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
 
 	var thread models.Thread
@@ -121,4 +133,14 @@ func (use *UseStruct) GetUsersByEmail(email string) (User []models.User, Err err
 	}
 
 	return users,nil
+}
+
+func (use *UseStruct) GetStatus() (Status models.Status, Err error) {
+	status, err := use.Rep.SelectStatus()
+
+	if err != nil {
+		return models.Status{}, err
+	}
+
+	return status, nil
 }

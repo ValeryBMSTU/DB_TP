@@ -15,6 +15,8 @@ const (
 		"VALUES ($1,$2,$3,$4,$5) RETURNING id, thread;"
 	SELECTPostsByID = "SELECT p.author, p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread " +
 		"FROM forum.post as p WHERE p.id = $1"
+	SELECTPostsByIDThreadID = "SELECT p.author, p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread " +
+		"FROM forum.post as p WHERE p.id = $1 AND p.thread = $2"
 
 
 	SELECTPostsFlat = "SELECT p.author, p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread " +
@@ -23,14 +25,14 @@ const (
 		"FROM forum.post as p WHERE p.thread = $1 AND p.id < $3 ORDER BY p.id DESC LIMIT $2"
 
 
-	SELECTPostsTree = "WITH RECURSIVE temp1 (author, created, forum, id, isEdited, message, parent, thread, PATH, LEVEL ) AS ( " +
-	"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (1000000 + T1.id AS VARCHAR (50)) as PATH, 1 " +
-"FROM forum.post as T1 WHERE T1.parent = 0 AND T1.thread = $1"+
+	SELECTPostsTree = "WITH RECURSIVE temp1 (author, created, forum, id, isEdited, message, parent, thread, PATH, LEVEL, root ) AS ( " +
+"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (10000 + T1.id AS VARCHAR (50)) as PATH, 1, T1.id as root " +
+"FROM forum.post as T1 WHERE T1.parent = 0 and T1.thread = $1 " +
 "union " +
-"select T2.author, T2.created, T2.forum, T2.id, T2.isEdited, T2.message, T2.parent, T2.thread, CAST ( temp1.PATH ||'->'|| T2.id AS VARCHAR(50)), LEVEL + 1 " +
+"select T2.author, T2.created, T2.forum, T2.id, T2.isEdited, T2.message, T2.parent, T2.thread, CAST ( temp1.PATH ||'->'|| 10000 + T2.id AS VARCHAR(50)), LEVEL + 1, root " +
 "FROM forum.post T2 INNER JOIN temp1 ON( temp1.id = T2.parent) " +
 ") " +
-"select author, created, forum, id, isEdited, message, parent, thread from temp1 WHERE id > $3 ORDER BY PATH LIMIT $2;"
+"select author, created, forum, id, isEdited, message, parent, thread from temp1 ORDER BY root, PATH LIMIT $2;"
 
 	SELECTPostsTreeSince = "WITH RECURSIVE temp1 (author, created, forum, id, isEdited, message, parent, thread, PATH, LEVEL ) AS ( " +
 		"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (1000000 + T1.id AS VARCHAR (50)) as PATH, 1 " +
@@ -58,20 +60,20 @@ const (
 		") " +
 		"select author, created, forum, id, isEdited, message, parent, thread from temp1 ORDER BY PATH;"
 
-	SELECTPostsParentTree = "WITH RECURSIVE temp1 (author, created, forum, id, isEdited, message, parent, thread, PATH, LEVEL ) AS ( " +
-		"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (1000000 + T1.id AS VARCHAR (50)) as PATH, 1 " +
+	SELECTPostsParentTree = "WITH RECURSIVE temp1 (author, created, forum, id, isEdited, message, parent, thread, PATH, LEVEL, root ) AS ( " +
+		"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (10000 + T1.id AS VARCHAR (50)) as PATH, 1, T1.id as root " +
 		"FROM forum.post as T1 WHERE T1.parent = 0 AND T1.thread = $1"+
 		"union " +
-		"select T2.author, T2.created, T2.forum, T2.id, T2.isEdited, T2.message, T2.parent, T2.thread, CAST ( temp1.PATH ||'->'|| T2.id AS VARCHAR(50)), LEVEL + 1 " +
+		"select T2.author, T2.created, T2.forum, T2.id, T2.isEdited, T2.message, T2.parent, T2.thread, CAST ( temp1.PATH ||'->'|| 10000 + T2.id AS VARCHAR(50)), LEVEL + 1, root " +
 		"FROM forum.post T2 INNER JOIN temp1 ON( temp1.id = T2.parent) " +
 		") " +
-		"select author, created, forum, id, isEdited, message, parent, thread from temp1 ORDER BY PATH;"
+		"select author, created, forum, id, isEdited, message, parent, thread from temp1 ORDER BY root, PATH;"
 
 	SELECTPostsParentTreeDesc = "WITH RECURSIVE temp1 (author, created, forum, id, isEdited, message, parent, thread, PATH, LEVEL, root ) AS ( " +
-"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (1000000 + T1.id AS VARCHAR (50)) as PATH, 1, T1.id as root " +
+"SELECT T1.author, T1.created, T1.forum, T1.id, T1.isEdited, T1.message, T1.parent, T1.thread, CAST (10000 + T1.id AS VARCHAR (50)) as PATH, 1, T1.id as root " +
 		"FROM forum.post as T1 WHERE T1.parent = 0 AND T1.thread = $1" +
 		"union " +
-		"select  T2.author, T2.created, T2.forum, T2.id, T2.isEdited, T2.message, T2.parent, T2.thread, CAST ( temp1.PATH ||'->'|| T2.id AS VARCHAR(50)), LEVEL + 1, root " +
+		"select  T2.author, T2.created, T2.forum, T2.id, T2.isEdited, T2.message, T2.parent, T2.thread, CAST ( temp1.PATH ||'->'|| 10000 + T2.id AS VARCHAR(50)), LEVEL + 1, root " +
 		"FROM forum.post as T2 INNER JOIN temp1 ON( temp1.id = T2.parent) " +
 		") " +
 		"select author, created, forum, id, isEdited, message, parent, thread  from temp1 ORDER BY root desc, PATH;"
@@ -141,6 +143,14 @@ UPDATEUserByNickname = "UPDATE forum.user SET about = $1, email = $2, fullname =
 		"VALUES ($1,$2,$3) RETURNING id;"
 	UPDATEVote = "UPDATE forum.vote SET voice = $1 WHERE nickname = $2 AND thread = $3;"
 
+
+	SELECTStatus =  "SELECT " +
+"(SELECT COALESCE(SUM(forum.posts), 0) FROM forum.forum WHERE posts > 0) AS post, " +
+"(SELECT COALESCE(SUM(forum.threads), 0) FROM forum.forum WHERE threads > 0) AS thread, " +
+"(SELECT COUNT(*) FROM forum.user) AS user, " +
+"(SELECT COUNT(*) FROM forum.forum) AS forum;"
+
+	CLEARE = "TRUNCATE forum.vote, forum.post, forum.thread, forum.forum, forum.user RESTART IDENTITY CASCADE;"
 
 	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 

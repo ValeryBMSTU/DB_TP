@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"github.com/lib/pq"
 	"strconv"
@@ -15,8 +16,17 @@ func (use *UseStruct) SetPost(changePost models.ChangePost, postID int) (Post mo
 		return post, err
 	}
 
-	post.Message  = changePost.Message
 	post.Created  = date
+	if changePost.Message == "" {
+		changePost.Message = post.Message
+		post.IsEdited = false
+		return post, nil
+	} else if changePost.Message == post.Message{
+		post.IsEdited = false
+		return post, nil
+	} else {
+		post.Message  = changePost.Message
+	}
 	post.IsEdited = true
 
 	if err := use.Rep.UpdatePost(changePost, postID); err != nil {
@@ -35,7 +45,7 @@ func (use *UseStruct) SetThread(changeThread models.ChangeThread, slugOrID strin
 			return models.Thread{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Thread{}, nil
+			return models.Thread{}, errors.New("Can't find thread")
 		}
 		thread = *(*threads)[0]
 		id = (*threads)[0].ID
@@ -45,7 +55,7 @@ func (use *UseStruct) SetThread(changeThread models.ChangeThread, slugOrID strin
 			return models.Thread{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Thread{}, nil
+			return models.Thread{}, errors.New("Can't find thread")
 		}
 		thread = *(*threads)[0]
 		id = (*threads)[0].ID
@@ -115,7 +125,7 @@ func (use *UseStruct) SetVote(newVote models.NewVote, slugOrID string) (Thread m
 			return models.Thread{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Thread{}, nil
+			return models.Thread{}, errors.New("Can't find thread")
 		}
 		id = (*threads)[0].ID
 		thread = *(*threads)[0]
@@ -125,7 +135,7 @@ func (use *UseStruct) SetVote(newVote models.NewVote, slugOrID string) (Thread m
 			return models.Thread{}, err
 		}
 		if len(*threads) != 1 {
-			return models.Thread{}, nil
+			return models.Thread{}, errors.New("Can't find thread")
 		}
 		id = (*threads)[0].ID
 		thread = *(*threads)[0]
