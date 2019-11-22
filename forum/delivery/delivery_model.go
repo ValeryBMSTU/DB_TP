@@ -17,7 +17,8 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface)
 	e.GET( "/forum/:slug/details", h.TakeForum)
 	e.GET( "/forum/:slug/threads", h.TakeForumThreads)
 
-	e.POST ("/thread/:slug_or_id/create", h.CreatePosts)
+	e.POST("/thread/:slug_or_id/create", h.CreatePosts)
+	e.POST("/post/:id/details", h.ChangePost)
 	e.GET( "/thread/:slug_or_id/posts", h.TakePosts)
 
 	e.POST( "/forum/:slug/create", h.CreateThread)

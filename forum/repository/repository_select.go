@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
-	"sort"
+	xsort "sort"
 	"strconv"
 	"strings"
 )
@@ -32,6 +32,31 @@ func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, E
 	return forums, nil
 }
 
+func (rep *ReposStruct) SelectPostByID(ID int) (Post models.Post, Err error) {
+	var posts []models.Post
+	rows, err := rep.DataBase.Query(consts.SELECTPostsByID, ID)
+	defer rows.Close()
+	if err != nil {
+		return models.Post{}, err
+	}
+
+	scanPost := models.Post{}
+	for rows.Next() {
+		err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+			&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
+			&scanPost.Thread)
+		if err != nil {
+			return models.Post{}, err
+		}
+		posts = append(posts, scanPost)
+	}
+
+	if len(posts) == 0 {
+		return models.Post{}, errors.New("Can't find user by nickname")
+	}
+	return posts[0], nil
+}
+
 func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
 	posts := models.Posts{}
 
@@ -46,15 +71,23 @@ func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc strin
 
 	} else if sort == "tree" {
 		if desc == "false" {
-			rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit, since)
+			if since != "0" && since != "999999999" {
+				rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID,  100000, 0)
+			} else {
+				rows, err = rep.DataBase.Query(consts.SELECTPostsTree, threadID, limit, 0)
+			}
 		} else {
-			rows, err = rep.DataBase.Query(consts.SELECTPostsTreeDesc, threadID, limit, since)
+			if since != "0" && since != "999999999" {
+				rows, err = rep.DataBase.Query(consts.SELECTPostsTreeSinceDesc, threadID)
+			} else {
+				rows, err = rep.DataBase.Query(consts.SELECTPostsTreeDesc, threadID, limit, 1000000)
+			}
 		}
 	} else if sort == "parent_tree" {
 		if desc == "false" {
-			rows, err = rep.DataBase.Query(consts.SELECTPostsParentTree, threadID, since)
+			rows, err = rep.DataBase.Query(consts.SELECTPostsParentTree, threadID)
 		} else {
-			rows, err = rep.DataBase.Query(consts.SELECTPostsParentTreeDesc, threadID, since)
+			rows, err = rep.DataBase.Query(consts.SELECTPostsParentTreeDesc, threadID)
 		}
 	}
 
@@ -92,17 +125,151 @@ func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc strin
 				return &posts, err
 			}
 
-			posts = append(posts, &scanPost)
-
 			if scanPost.Parent == 0 {
 				count = count + 1
 			}
-			if count >= limitDigit {
-				rows.Close()
-				return &posts, nil
+			if count > limitDigit && (since == "0" || since == "999999999") {
+				break
+			} else {
+				posts = append(posts, &scanPost)
 			}
+
 		}
 		rows.Close()
+	}
+
+	if since != "0" && since != "999999999" && sort == "tree"{
+		limitDigit, _ := strconv.Atoi(limit)
+		sinceDigit, _ := strconv.Atoi(since)
+		sincePosts := models.Posts{}
+		counter := 0
+		//for ; posts[counter].ID <= sinceDigit && counter < len(posts); {
+		//	counter++
+		//}
+		if desc == "false" {
+			startIndex := 1000000000
+			//postMinStartIndex
+			minValue := 100000000000
+			for i := 0; i < len(posts); i++ {
+				if (posts[i].ID == sinceDigit) {
+					startIndex = i + 1
+					break
+				}
+				if (posts[i].ID > sinceDigit) && (posts[i].ID < minValue) {
+					startIndex = i
+					minValue = posts[i].ID
+				}
+			}
+			sincePostsCount := 0
+			counter = startIndex
+			for ; sincePostsCount < limitDigit && counter < len(posts); {
+				scanPost := models.Post{}
+				scanPost = *posts[counter]
+				sincePosts = append(sincePosts, &scanPost)
+				if sort == "tree" {
+					sincePostsCount++
+				} else {
+					if scanPost.Parent == 0 {
+						sincePostsCount++
+					}
+				}
+				counter++
+			}
+		} else {
+			startIndex := -1000000000
+			//postMinStartIndex
+			maxValue := 0
+			for i := len(posts) - 1; i >= 0; i-- {
+				if (posts[i].ID == sinceDigit) {
+					startIndex = i - 1
+					break
+				}
+				if (posts[i].ID < sinceDigit) && (posts[i].ID > maxValue) {
+					startIndex = i
+					maxValue = posts[i].ID
+				}
+			}
+
+			//xsort.Slice(posts[0:startIndex], func(i, j int) bool { return posts[i].ID < posts[j].ID})
+			sincePostsCount := 0
+			counter = startIndex
+			for ; sincePostsCount < limitDigit && counter >= 0; {
+				scanPost := models.Post{}
+				scanPost = *posts[counter]
+				sincePosts = append(sincePosts, &scanPost)
+				if sort == "tree" {
+					sincePostsCount++
+				} else {
+					if scanPost.Parent == 0 {
+						sincePostsCount++
+					}
+				}
+				counter--
+			}
+		}
+		return  &sincePosts, nil
+	}
+
+	if since != "0" && since != "999999999" && sort == "parent_tree" {
+		limitDigit, _ := strconv.Atoi(limit)
+		sinceDigit, _ := strconv.Atoi(since)
+		sincePosts := models.Posts{}
+		counter := 0
+		if desc == "false" {
+			startIndex := 1000000000
+			minValue := 100000000000
+			for i := 0; i < len(posts); i++ {
+				if (posts[i].ID == sinceDigit) {
+					startIndex = i + 1
+					break
+				}
+				if (posts[i].ID > sinceDigit) && (posts[i].ID < minValue) {
+					startIndex = i
+					minValue = posts[i].ID
+				}
+			}
+			sincePostsCount := 0
+			counter = startIndex
+			for ; sincePostsCount < limitDigit && counter < len(posts); {
+				scanPost := models.Post{}
+				scanPost = *posts[counter]
+				sincePosts = append(sincePosts, &scanPost)
+				sincePostsCount++
+				counter++
+			}
+		} else {
+			startIndex := -1000000000
+			//postMinStartIndex
+			maxValue := 100000000000
+			for i := len(posts) - 1; i >= 0; i-- {
+				if (posts[i].ID == sinceDigit) {
+					startIndex = i + 1
+					break
+				}
+				if (posts[i].ID < sinceDigit) && (posts[i].ID < maxValue) {
+					startIndex = i
+					maxValue = posts[i].ID
+				}
+			}
+
+			//xsort.Slice(posts[0:startIndex], func(i, j int) bool { return posts[i].ID < posts[j].ID})
+			sincePostsCount := 0
+			counter = startIndex
+			for ; sincePostsCount < limitDigit && counter < len(posts); {
+				scanPost := models.Post{}
+				scanPost = *posts[counter]
+				sincePosts = append(sincePosts, &scanPost)
+				if sort == "tree" {
+					sincePostsCount++
+				} else {
+					if scanPost.Parent == 0 {
+						sincePostsCount++
+					}
+				}
+				counter++
+			}
+		}
+		return  &sincePosts, nil
 	}
 
 	return &posts, nil
@@ -189,7 +356,7 @@ func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since s
 }
 
 func (rep *ReposStruct) SelectUsersByForum(slug, limit, since, desc string) (Users *models.Users, Err error) {
-	var users models.Users
+	users := models.Users{}
 	var rows *sql.Rows
 	var err error
 	//if since == "" {
@@ -224,24 +391,49 @@ func (rep *ReposStruct) SelectUsersByForum(slug, limit, since, desc string) (Use
 	//ab := []byte(strings.ToLower(users[0].Nickname))
 	//	println(ab)
 
-	sort.Slice(users, func(i, j int) bool { return bytes.Compare([]byte(strings.ToLower(users[i].Nickname)),[]byte(strings.ToLower(users[j].Nickname))) < 0})
 
 
-	var resUsers models.Users
+	resUsers := models.Users{}
 
 	limitDigit, _ := strconv.Atoi(limit)
-	if since == "" {
-		for i := 0; i < limitDigit && i < len(users); i++ {
-			resUsers = append(resUsers, users[i])
+
+	if desc == "false" {
+
+		xsort.Slice(users, func(i, j int) bool { return bytes.Compare([]byte(strings.ToLower(users[i].Nickname)),[]byte(strings.ToLower(users[j].Nickname))) < 0})
+
+
+		if since == "" {
+			for i := 0; i < limitDigit && i < len(users); i++ {
+				resUsers = append(resUsers, users[i])
+			}
+		} else {
+			j := 0
+			for i := 0; j < limitDigit && i < len(users); {
+				if bytes.Compare([]byte(strings.ToLower(users[i].Nickname)), []byte(strings.ToLower(since))) > 0 {
+					resUsers = append(resUsers, users[i])
+					j++
+				}
+				i++
+			}
 		}
 	} else {
-		j := 0
-		for i := 0; j < limitDigit && i < len(users); {
-			if bytes.Compare([]byte(strings.ToLower(users[i].Nickname)), []byte(strings.ToLower(since))) < 0 {
+
+		xsort.Slice(users, func(i, j int) bool { return bytes.Compare([]byte(strings.ToLower(users[i].Nickname)),[]byte(strings.ToLower(users[j].Nickname))) > 0})
+
+
+		if since == "" {
+			for i := 0; i < limitDigit && i < len(users); i++ {
 				resUsers = append(resUsers, users[i])
-				j++
 			}
-			i++
+		} else {
+			j := 0
+			for i := 0; j < limitDigit && i < len(users); {
+				if bytes.Compare([]byte(strings.ToLower(users[i].Nickname)), []byte(strings.ToLower(since))) < 0 {
+					resUsers = append(resUsers, users[i])
+					j++
+				}
+				i++
+			}
 		}
 	}
 

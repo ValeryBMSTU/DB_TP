@@ -6,6 +6,26 @@ import (
 	"strconv"
 )
 
+const date = "1970-01-01T00:00:00.000Z"
+
+func (use *UseStruct) SetPost(changePost models.ChangePost, postID int) (Post models.Post, Err error) {
+
+	post, err := use.Rep.SelectPostByID(postID)
+	if err != nil {
+		return post, err
+	}
+
+	post.Message  = changePost.Message
+	post.Created  = date
+	post.IsEdited = true
+
+	if err := use.Rep.UpdatePost(changePost, postID); err != nil {
+		return models.Post{}, err
+	}
+
+	return post, nil
+}
+
 func (use *UseStruct) SetThread(changeThread models.ChangeThread, slugOrID string) (Thread models.Thread, Err error) {
 	thread := models.Thread{}
 	id, err := strconv.Atoi(slugOrID)

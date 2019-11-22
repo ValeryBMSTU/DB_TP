@@ -5,6 +5,16 @@ import (
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 )
 
+func (rep *ReposStruct) UpdatePost(changePost models.ChangePost, postID int) (Err error) {
+	rows, err := rep.DataBase.Query(consts.UPDATEPostByID, changePost.Message, true, postID)
+	defer rows.Close()
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (rep *ReposStruct) UpdateThread(changeThread models.ChangeThread, id int) (Err error) {
 	rows, err := rep.DataBase.Query(consts.UPDATEThreadByID, changeThread.Message,
 		changeThread.Title, id)

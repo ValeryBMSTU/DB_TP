@@ -84,8 +84,8 @@ func (use *UseStruct) GetThreadsByForum(forum string, limit string, since string
 	return threads,nil
 }
 
-func (use *UseStruct) GetUsersByForum(slug, limit, desc string) (Users *models.Users, Err error) {
-	users, err := use.Rep.SelectUsersByForum(slug, limit, desc)
+func (use *UseStruct) GetUsersByForum(slug, limit, since, desc string) (Users *models.Users, Err error) {
+	users, err := use.Rep.SelectUsersByForum(slug, limit, since, desc)
 	if err != nil {
 		return users, err
 	}

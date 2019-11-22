@@ -16,7 +16,9 @@ type ReposInterface interface {
 	SelectForumsBySlug(slug string) (forum []models.Forum, Err error)
 
 	InsertPost(newPost models.NewPost, id int, forum string, created time.Time) (LastID int, Thread int, Err error)
+	SelectPostByID(ID int) (Post models.Post, Err error)
 	SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error)
+	UpdatePost(changePost models.ChangePost, postID int) (Err error)
 
 	InsertThread(newThread models.NewThread, forum string) (LastID int, Err error)
 	UpdateThread(changeThread models.ChangeThread, id int) (Err error)
@@ -25,7 +27,7 @@ type ReposInterface interface {
 	SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error)
 
 	InsertUser(newUser models.NewUser, nickname string) (Err error)
-	SelectUsersByForum(slug, limit, desc string) (Users *models.Users, Err error)
+	SelectUsersByForum(slug, limit, since, desc string) (Users *models.Users, Err error)
 	SelectUserByNickname(nickname string) (user models.User, Err error)
 	SelectUsersByEmail(email string) (Users []models.User, Err error)
 	SelectUsersByNicknameOrEmail(email string, nickname string) (Users []models.User, Err error)

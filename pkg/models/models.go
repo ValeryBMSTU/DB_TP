@@ -24,6 +24,10 @@ type NewPost struct {
 	Parent int `json:"parent"`
 }
 
+type ChangePost struct {
+	Message string `json:"message"`
+}
+
 type Post struct {
 	Author string `json:"author"`
 	Created string `json:"created"`

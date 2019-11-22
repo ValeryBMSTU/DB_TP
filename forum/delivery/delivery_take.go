@@ -148,9 +148,11 @@ func (h *HandlersStruct) TakeUsersByForum(ctx echo.Context) (Err error) {
 		if err := ctx.JSON(404, models.Error{"Can't find forum by slug"}); err != nil {
 			return err
 		}
+		return nil
 	}
 
 	limit := ctx.QueryParam("limit")
+	since := ctx.QueryParam("since")
 	desc := ctx.QueryParam( "desc")
 
 	if limit == "" {
@@ -160,7 +162,7 @@ func (h *HandlersStruct) TakeUsersByForum(ctx echo.Context) (Err error) {
 		desc = "false"
 	}
 
-	users, err := h.Use.GetUsersByForum(slug, limit, desc)
+	users, err := h.Use.GetUsersByForum(slug, limit, since, desc)
 	if err != nil {
 		return err
 	}

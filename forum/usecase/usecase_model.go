@@ -23,6 +23,7 @@ type UseInterface interface {
 	GetForumsBySlug(slug string) (forum []models.Forum, Err error)
 
 	AddPosts(newPosts models.NewPosts, slug_or_id string) (posts models.Posts, Err error)
+	SetPost(changePost models.ChangePost, postID int) (Post models.Post, Err error)
 	GetPosts(slugOrID, limit, since, sort, desc string) (posts *models.Posts, Err error)
 
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
@@ -31,7 +32,7 @@ type UseInterface interface {
 	GetThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error)
 
 	AddUser(newUser models.NewUser, nickname string) (user models.User, Err error)
-	GetUsersByForum(slug, limit, desc string) (Users *models.Users, Err error)
+	GetUsersByForum(slug, limit, since, desc string) (Users *models.Users, Err error)
 	GetUserByNickname(nickname string) (user models.User, Err error)
 	GetUsersByEmail(email string) (user []models.User, Err error)
 	GetUsersByNicknameOrEmail(email string, nickname string) (user []models.User, Err error)
