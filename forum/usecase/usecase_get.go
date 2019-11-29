@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
 	"strconv"
+	"strings"
 )
 
 func (use *UseStruct) GetForumsBySlug(slug string) (Forum []models.Forum, Err error) {
@@ -15,16 +16,44 @@ func (use *UseStruct) GetForumsBySlug(slug string) (Forum []models.Forum, Err er
 	return forums,nil
 }
 
-func (use *UseStruct) GetPostByID(ID int) (Post models.Post, Err error) {
-	post, err := use.Rep.SelectPostByID(ID)
+func (use *UseStruct) GetPostByID(ID int, related string) (Post models.PostDetails, Err error) {
+	var postDetails models.PostDetails
 
+	post, err := use.Rep.SelectPostByID(ID)
 	if err != nil {
-		return post, err
+		return postDetails, err
+	}
+	post.Created = date
+	postDetails.Post = post
+
+	var user models.User
+	if strings.Contains(related, "user") {
+		user, err = use.Rep.SelectUserByNickname(post.Author)
+		if err != nil {
+			return postDetails, nil
+		}
+		postDetails.User = user
 	}
 
-	post.Created = date
+	if strings.Contains(related, "thread") {
+		threads, err := use.Rep.SelectThreadsByID(post.Thread)
+		if err != nil || len(*threads) != 1 {
+			return postDetails, nil
+		}
 
-	return post,nil
+		postDetails.Thread = (*threads)[0]
+	}
+
+	if strings.Contains(related, "forum") {
+		forums, err := use.Rep.SelectForumsBySlug(post.Forum)
+		if err != nil || len(forums) != 1 {
+			return postDetails, nil
+		}
+
+		postDetails.Forum = forums[0]
+	}
+
+	return postDetails,nil
 }
 
 func (use *UseStruct) GetPosts(slugOrID, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
@@ -144,3 +173,12 @@ func (use *UseStruct) GetStatus() (Status models.Status, Err error) {
 
 	return status, nil
 }
+//
+//func (use *UseStruct) GetPostDetails(postID int) (post models.Post, Err error) {
+//	post, err := use.Rep.SelectPostByID(postID)
+//	if err != nil {
+//		return post, err
+//	}
+//
+//	return post, nil
+//}

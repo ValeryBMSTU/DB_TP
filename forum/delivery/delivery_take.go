@@ -44,9 +44,15 @@ func (h *HandlersStruct) TakePostByID(ctx echo.Context) (Err error) {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 
 	ID := ctx.Param("id")
-	postID, _ := strconv.Atoi(ID)
+	postID, err := strconv.Atoi(ID)
+	if err != nil {
+		return nil
+	}
 
-	post, err := h.Use.GetPostByID(postID)
+	related := ctx.QueryParam("related")
+	println(related)
+
+	postDetails, err := h.Use.GetPostByID(postID, related)
 	if err != nil {
 		if err := ctx.JSON(404, models.Error{"Can't find post"}); err != nil {
 			return err
@@ -54,7 +60,7 @@ func (h *HandlersStruct) TakePostByID(ctx echo.Context) (Err error) {
 		return nil
 	}
 
-	if err := ctx.JSON(200, models.PostDetails{post}); err != nil {
+	if err := ctx.JSON(200, postDetails); err != nil {
 		return err
 	}
 
@@ -269,3 +275,37 @@ func (h *HandlersStruct) TakeStatus(ctx echo.Context) (Err error) {
 
 	return nil
 }
+
+//func (h *HandlersStruct) TakePostDetails(ctx echo.Context) (Err error) {
+//	defer func() {
+//		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+//			Err = errors.Wrap(Err, bodyErr.Error())
+//		}
+//	}()
+//
+//	ctx.Response().Header().Set("Content-Type", "application/json")
+//
+//	ID := ctx.Param("id")
+//	postID, err := strconv.Atoi(ID)
+//	if err != nil {
+//		return err
+//	}
+//
+//	related := ctx.QueryParam("related")
+//	println(related)
+//
+//
+//	post, err := h.Use.GetPostDetails(postID)
+//	if err != nil {
+//		if err := ctx.JSON(404, models.Error{"Can't find post"}); err != nil {
+//			return err
+//		}
+//		return nil
+//	}
+//
+//	if err := ctx.JSON(200, post); err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}

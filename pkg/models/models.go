@@ -50,6 +50,9 @@ type EditedPost struct {
 }
 
 type PostDetails struct {
+	Forum interface{}  `json:"forum,omitempty"`
+	Thread interface{} `json:"thread,omitempty"`
+ 	User interface{} `json:"author,omitempty"`
 	Post interface{} `json:"post"`
 }
 

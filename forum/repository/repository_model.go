@@ -19,6 +19,7 @@ type ReposInterface interface {
 	SelectPostByID(ID int) (Post models.Post, Err error)
 	SelectPostByIDThreadID(ID int, threadID int) (Post models.Post, Err error)
 	SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error)
+	//SelectPostByID(postID int) (Post models.Post, Err error)
 	UpdatePost(changePost models.ChangePost, postID int) (Err error)
 
 	InsertThread(newThread models.NewThread, forum string) (LastID int, Err error)

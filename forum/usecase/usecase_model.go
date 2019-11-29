@@ -24,8 +24,9 @@ type UseInterface interface {
 
 	AddPosts(newPosts models.NewPosts, slug_or_id string) (posts models.Posts, Err error)
 	SetPost(changePost models.ChangePost, postID int) (Post models.Post, Err error)
-	GetPostByID(ID int) (Post models.Post, Err error)
+	GetPostByID(ID int, related string) (Post models.PostDetails, Err error)
 	GetPosts(slugOrID, limit, since, sort, desc string) (posts *models.Posts, Err error)
+	//GetPostDetails(postID int) (post models.Post, Err error)
 
 	AddThread(newThread models.NewThread, forum string) (thread models.Thread, Err error)
 	SetThread(changeThread models.ChangeThread, slugOrID string) (Thread models.Thread, Err error)
