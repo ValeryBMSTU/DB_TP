@@ -1,11 +1,11 @@
 CREATE SCHEMA forum;
 
-
-ALTER SCHEMA forum OWNER TO postgres;
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
+--
+-- ALTER SCHEMA forum OWNER TO postgres;
+--
+-- SET default_tablespace = '';
+--
+-- SET default_with_oids = false;
 
 --
 -- Name: vote; Type: TABLE; Schema: forum; Owner: postgres
@@ -19,7 +19,7 @@ CREATE TABLE forum.vote (
 );
 
 
-ALTER TABLE forum.vote OWNER TO postgres;
+-- ALTER TABLE forum.vote OWNER TO postgres;
 
 --
 -- Name: forum; Type: TABLE; Schema: forum; Owner: postgres
@@ -35,7 +35,7 @@ CREATE TABLE forum.forum (
 );
 
 
-ALTER TABLE forum.forum OWNER TO postgres;
+-- ALTER TABLE forum.forum OWNER TO postgres;
 
 --
 -- Name: forum_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
@@ -50,13 +50,13 @@ CREATE SEQUENCE forum.forum_id_seq
     CACHE 1;
 
 
-ALTER TABLE forum.forum_id_seq OWNER TO postgres;
+-- ALTER TABLE forum.forum_id_seq OWNER TO postgres;
 
 --
 -- Name: forum_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
 --
 
-ALTER SEQUENCE forum.forum_id_seq OWNED BY forum.forum.id;
+-- ALTER SEQUENCE forum.forum_id_seq OWNED BY forum.forum.id;
 
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE forum.post (
 );
 
 
-ALTER TABLE forum.post OWNER TO postgres;
+-- ALTER TABLE forum.post OWNER TO postgres;
 
 --
 -- Name: post_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
@@ -90,13 +90,13 @@ CREATE SEQUENCE forum.post_id_seq
     CACHE 1;
 
 
-ALTER TABLE forum.post_id_seq OWNER TO postgres;
+-- ALTER TABLE forum.post_id_seq OWNER TO postgres;
 
 --
 -- Name: post_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
 --
-
-ALTER SEQUENCE forum.post_id_seq OWNED BY forum.post.id;
+--
+-- ALTER SEQUENCE forum.post_id_seq OWNED BY forum.post.id;
 
 
 --
@@ -115,7 +115,7 @@ CREATE TABLE forum.thread (
 );
 
 
-ALTER TABLE forum.thread OWNER TO postgres;
+-- ALTER TABLE forum.thread OWNER TO postgres;
 
 --
 -- Name: table_name_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
@@ -130,7 +130,7 @@ CREATE SEQUENCE forum.table_name_id_seq
     CACHE 1;
 
 
-ALTER TABLE forum.table_name_id_seq OWNER TO postgres;
+-- ALTER TABLE forum.table_name_id_seq OWNER TO postgres;
 
 --
 -- Name: table_name_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
@@ -152,7 +152,7 @@ CREATE TABLE forum."user" (
 );
 
 
-ALTER TABLE forum."user" OWNER TO postgres;
+-- ALTER TABLE forum."user" OWNER TO postgres;
 
 --
 -- Name: user_id_seq; Type: SEQUENCE; Schema: forum; Owner: postgres
@@ -167,7 +167,7 @@ CREATE SEQUENCE forum.user_id_seq
     CACHE 1;
 
 
-ALTER TABLE forum.user_id_seq OWNER TO postgres;
+-- ALTER TABLE forum.user_id_seq OWNER TO postgres;
 
 --
 -- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
@@ -189,7 +189,7 @@ CREATE SEQUENCE forum.vote_id_seq
     CACHE 1;
 
 
-ALTER TABLE forum.vote_id_seq OWNER TO postgres;
+-- ALTER TABLE forum.vote_id_seq OWNER TO postgres;
 
 --
 -- Name: vote_id_seq; Type: SEQUENCE OWNED BY; Schema: forum; Owner: postgres
@@ -441,13 +441,13 @@ ALTER TABLE ONLY forum.vote
 
 
 CREATE OR REPLACE FUNCTION vote_add() RETURNS TRIGGER AS $emp_audit$
-BEGIN
-UPDATE forum.thread
-SET votes = votes + NEW.voice
-WHERE id = NEW.thread;
-RETURN NULL;
-END;
-$emp_audit$ LANGUAGE plpgsql;
+    BEGIN
+    UPDATE forum.thread
+    SET votes = votes + NEW.voice
+    WHERE id = NEW.thread;
+    RETURN NULL;
+    END;
+    $emp_audit$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION thread_add() RETURNS TRIGGER AS $emp_audit$
