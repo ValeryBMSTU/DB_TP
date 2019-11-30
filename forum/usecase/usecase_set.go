@@ -3,7 +3,7 @@ package usecase
 import (
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx"
 	"strconv"
 )
 
@@ -143,7 +143,7 @@ func (use *UseStruct) SetVote(newVote models.NewVote, slugOrID string) (Thread m
 
 	err = use.Rep.InsertVote(newVote, id)
 	if err != nil {
-		pqErr, ok := err.(*pq.Error)
+		pqErr, ok := err.(pgx.PgError)
 		if !ok {
 			return models.Thread{}, err
 		}

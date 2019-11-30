@@ -21,7 +21,7 @@ func main() {
 	handlers := delivery.HandlersStruct{}
 	var mutex sync.Mutex
 	rep := repository.ReposStruct{}
-	err := rep.DataBaseInit()
+	err := rep.DataBaseInit("postgresql://forum:forum@localhost:5432/forum")
 	if err != nil {
 		e.Logger.Errorf("repository error: %s", err)
 	}

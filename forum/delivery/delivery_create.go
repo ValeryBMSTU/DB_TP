@@ -3,8 +3,8 @@ package delivery
 import (
 	"encoding/json"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"github.com/jackc/pgx"
 	"github.com/labstack/echo"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -81,7 +81,7 @@ func (h *HandlersStruct) CreatePosts(ctx echo.Context) (Err error) {
 
 	posts, err := h.Use.AddPosts(newPosts, ctx.Param("slug_or_id"))
 	if err != nil {
-		_, ok := err.(*pq.Error)
+		_, ok := err.(pgx.PgError)
 		if !ok {
 			if err.Error() == "Can't find thread" {
 				if err := ctx.JSON(404, models.Error{"Can't find thread"}); err != nil {
@@ -158,7 +158,7 @@ func (h *HandlersStruct) CreateThread(ctx echo.Context) (Err error) {
 			}
 			return nil
 		}
-		pqErr, ok := err.(*pq.Error)
+		pqErr, ok := err.(pgx.PgError)
 		if !ok {
 			return err
 		}

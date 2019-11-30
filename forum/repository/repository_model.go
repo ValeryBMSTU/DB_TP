@@ -1,14 +1,14 @@
 package repository
 
 import (
-	"database/sql"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"github.com/jackc/pgx"
 	"time"
 )
 
 type ReposStruct struct {
 	connectionString string
-	DataBase         *sql.DB
+	DataBase         *pgx.ConnPool
 }
 
 type ReposInterface interface {

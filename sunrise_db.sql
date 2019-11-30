@@ -106,7 +106,7 @@ CREATE SEQUENCE forum.post_id_seq
 CREATE TABLE forum.thread (
     id integer NOT NULL,
     author text NOT NULL,
-    created timestamp with time zone,
+    created timestamptz DEFAULT now(),
     forum text NOT NULL,
     message text NOT NULL,
     slug text,

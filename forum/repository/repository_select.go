@@ -2,13 +2,14 @@ package repository
 
 import (
 	"bytes"
-	"database/sql"
 	"errors"
 	"github.com/ValeryBMSTU/DB_TP/pkg/consts"
 	"github.com/ValeryBMSTU/DB_TP/pkg/models"
+	"github.com/jackc/pgx"
 	xsort "sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func (rep *ReposStruct) SelectForumsBySlug(slug string) (Forum []models.Forum, Err error) {
@@ -42,12 +43,14 @@ func (rep *ReposStruct) SelectPostByID(ID int) (Post models.Post, Err error) {
 
 	scanPost := models.Post{}
 	for rows.Next() {
-		err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+		var timetz time.Time
+		err := rows.Scan(&scanPost.Author, &timetz, &scanPost.Forum,
 			&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
 			&scanPost.Thread)
 		if err != nil {
 			return models.Post{}, err
 		}
+		timetz.Format(time.RFC3339Nano)
 		posts = append(posts, scanPost)
 	}
 
@@ -67,12 +70,14 @@ func (rep *ReposStruct) SelectPostByIDThreadID(ID int, threadID int) (Post model
 
 	scanPost := models.Post{}
 	for rows.Next() {
-		err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+		var timetz time.Time
+		err := rows.Scan(&scanPost.Author, &timetz, &scanPost.Forum,
 			&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
 			&scanPost.Thread)
 		if err != nil {
 			return models.Post{}, err
 		}
+		scanPost.Created = timetz.Format(time.RFC3339Nano)
 		posts = append(posts, scanPost)
 	}
 
@@ -85,7 +90,7 @@ func (rep *ReposStruct) SelectPostByIDThreadID(ID int, threadID int) (Post model
 func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc string) (Posts *models.Posts, Err error) {
 	posts := models.Posts{}
 
-	var rows *sql.Rows
+	var rows *pgx.Rows
 	var err error
 	if sort == "flat" {
 		if desc == "false" {
@@ -124,12 +129,14 @@ func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc strin
 
 		for rows.Next() {
 			scanPost := models.Post{}
-			err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+			var timetz time.Time
+			err := rows.Scan(&scanPost.Author, &timetz, &scanPost.Forum,
 				&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
 				&scanPost.Thread)
 			if err != nil {
 				return &posts, err
 			}
+			scanPost.Created = timetz.Format(time.RFC3339Nano)
 			posts = append(posts, &scanPost)
 		}
 	} else {
@@ -143,7 +150,8 @@ func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc strin
 
 		for rows.Next() {
 			scanPost := models.Post{}
-			err := rows.Scan(&scanPost.Author, &scanPost.Created, &scanPost.Forum,
+			var timetz time.Time
+			err := rows.Scan(&scanPost.Author, &timetz, &scanPost.Forum,
 				&scanPost.ID, &scanPost.IsEdited, &scanPost.Message, &scanPost.Parent,
 				&scanPost.Thread)
 			if err != nil {
@@ -156,6 +164,7 @@ func (rep *ReposStruct) SelectPosts(threadID int, limit, since, sort, desc strin
 			if count > limitDigit && (since == "0" || since == "999999999") {
 				break
 			} else {
+				scanPost.Created = timetz.Format(time.RFC3339Nano)
 				posts = append(posts, &scanPost)
 			}
 
@@ -313,12 +322,14 @@ func (rep *ReposStruct) SelectThreadsBySlug(slug string) (Threads *models.Thread
 
 	for rows.Next() {
 		scanThread := models.Thread{}
-		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
+		var timetz time.Time
+		err := rows.Scan(&scanThread.Author, &timetz, &scanThread.Forum,
 			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
 			&scanThread.Votes)
 		if err != nil {
 			return &threads, err
 		}
+		scanThread.Created = timetz.Format(time.RFC3339Nano)
 		threads = append(threads, &scanThread)
 	}
 	return &threads, nil
@@ -337,12 +348,14 @@ func (rep *ReposStruct) SelectThreadsByID(id int) (Threads *models.Threads, Err 
 
 	for rows.Next() {
 		scanThread := models.Thread{}
-		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
+		var timetz time.Time
+		err := rows.Scan(&scanThread.Author, &timetz, &scanThread.Forum,
 			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
 			&scanThread.Votes)
 		if err != nil {
 			return &threads, err
 		}
+		scanThread.Created = timetz.Format(time.RFC3339Nano)
 		threads = append(threads, &scanThread)
 	}
 	return &threads, nil
@@ -351,7 +364,7 @@ func (rep *ReposStruct) SelectThreadsByID(id int) (Threads *models.Threads, Err 
 
 func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since string, desc string) (Threads *models.Threads, Err error) {
 	threads := models.Threads{}
-	var rows *sql.Rows
+	var rows *pgx.Rows
 	var err error
 	if since == "" && desc == "false" {
 		rows, err = rep.DataBase.Query(consts.SELECTThreadsByForum, forum, limit)
@@ -369,12 +382,14 @@ func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since s
 
 	for rows.Next() {
 		scanThread := models.Thread{}
-		err := rows.Scan(&scanThread.Author, &scanThread.Created, &scanThread.Forum,
+		var timetz time.Time
+		err := rows.Scan(&scanThread.Author, &timetz, &scanThread.Forum,
 			&scanThread.ID, &scanThread.Message, &scanThread.Slug, &scanThread.Title,
 			&scanThread.Votes)
 		if err != nil {
 			return &threads, err
 		}
+		scanThread.Created = timetz.Format(time.RFC3339Nano)
 		threads = append(threads, &scanThread)
 	}
 	return &threads, nil
@@ -382,7 +397,7 @@ func (rep *ReposStruct) SelectThreadsByForum(forum string, limit string, since s
 
 func (rep *ReposStruct) SelectUsersByForum(slug, limit, since, desc string) (Users *models.Users, Err error) {
 	users := models.Users{}
-	var rows *sql.Rows
+	var rows *pgx.Rows
 	var err error
 	//if since == "" {
 		if desc == "false" {
