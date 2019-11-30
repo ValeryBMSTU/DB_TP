@@ -20,7 +20,7 @@ RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/$PGSQLVER/main/pg_
 EXPOSE 5432
 
 # Golang installing
-ENV GOVERSION 1.13
+ENV GOVERSION 1.12
 USER root
 RUN wget https://storage.googleapis.com/golang/go$GOVERSION.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
