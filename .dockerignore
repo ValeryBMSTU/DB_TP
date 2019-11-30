@@ -4,5 +4,3 @@
 
 # Docker
 .dockerignore
-
-go.sum
